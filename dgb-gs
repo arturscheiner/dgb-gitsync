@@ -1,0 +1,40 @@
+#!/bin/bash
+
+PIPE_NAME=$1
+BASE_PATH=$HOME/.dgb-ps
+mkdir -p $BASE_PATH/$PIPE_NAME
+
+PIPE_PATH="$BASE_PATH/$PIPE_NAME"
+PIPE_JSON="$PIPE_PATH/flowspec.json"
+PIPE_LINE=$(digibeectl get pipeline -n $PIPE_NAME | awk 'NR==2')
+
+IFS=" " read -r -a PIPE_INFO <<< "$PIPE_LINE"
+
+PIPE_ID=${PIPE_INFO[1]}
+PIPE_VERSION=${PIPE_INFO[2]}
+PIPE_CHECKSUM=$(cat $PIPE_PATH/version.json | jq -r '.checksum')
+
+echo "Sync - $PIPE_NAME"
+echo "Pipeline ID - $PIPE_ID"
+echo "Pipeline Version = $PIPE_VERSION"
+echo "File output - $PIPE_JSON"
+echo "Previous Checksum - $PIPE_CHECKSUM"
+
+digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | jq > $PIPE_JSON 
+
+#New Checksum
+PIPE_CHECKSUM=$(shasum $PIPE_JSON | awk '{print $1}' | awk '{print substr($0,0,5)}')
+
+cat <<EOT > $PIPE_PATH/version.json
+{
+  "name" : "$PIPE_NAME",
+  "id" : "$PIPE_ID",
+  "version" : "$PIPE_VERSION",
+  "checksum" : "$PIPE_CHECKSUM"
+}
+EOT
+
+cd $PIPE_PATH
+git add .
+git commit -m "Version $PIPE_VERSION.$PIPE_CHECKSUM"
+git push
