@@ -27,7 +27,7 @@ Init()
     fi 
 }
 
-old()
+gitSync()
 {
 PIPE_NAME=$1
 BASE_PATH=$HOME/.dgb-gs
@@ -80,12 +80,12 @@ Help()
     printf "a\tAdd a new pipeline to the switch list\n\tE.g. -> $(TT green)$THIS_TYPE -a$(TT white)\n\n"
     printf "l\tList all the pipelines configured\n\tE.g. -> $(TT green)$THIS_TYPE -l$(TT white)\n\n"
     printf "r\tRemove a pipeline from the switch list\n\tE.g. -> $(TT green)$THIS_TYPE -r $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
-    printf "s\tSet an active pipeline\n\tE.g. -> $(TT green)$THIS_TYPE -s $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
+    printf "s\tSync a pipeline with a git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
     printf "u\tUnset the active pipeline\n\tE.g. -> $(TT green)$THIS_TYPE -u$(TT normal; TT white)\n\n"
    
-    if [[ $0 == ./* ]]; then
-        printf "$(TT yellow)about this script$(TT white)\n"
-        printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
+   printf "$(TT yellow)about this script$(TT white)\n"
+   printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
+    if [[ $0 == ./* ]]; then    
         printf "d\tDeploy this script into a directory\n\tE.g. -> $(TT green)sudo $THIS_TYPE -d /usr/local/bin$(TT white)\n\n"
     fi
 
@@ -156,18 +156,20 @@ Warning()
 Title()
 {
     MESSAGE=$1
-    printf "$(TT green; TT bold)$MESSAGE$(TT normal; TT white)\n\n"
+    [ -z $2 ] && COLOR="green" || COLOR=$2
+    printf "$(TT $COLOR; TT bold)$MESSAGE$(TT normal; TT white)\n\n"
 }
 
 Check()
 {
     Title "Check this script deployment and its dependencies"
-    Title "Check this script deployment"
-    CheckThisScript
-
-    Title "Check this script dependencies"
+    Title "about dependencies" white
     CheckDigibeeCtl
     CheckGit
+    printf "\n"
+    Title "about this script" white
+    CheckThisScript
+    printf "\n"
 }
 
 CheckThisScript()
@@ -176,31 +178,23 @@ CheckThisScript()
 
     if [ -z $TRY_FIND ]
     then
-        echo "Seems that this script is not deployed on a PATH, yet!"
-        echo "These are the available PATHS configured for this profile:"
-        echo $PATHS
+        printf "$(TT red; TT bold)\xE2\x9C\x97$(TT white; TT normal) This script is not deployed on a PATH.\n" 
+        printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) These are the available PATHS configured for this profile:\n"
+        
+
         
         for p in $(echo $USER_PATHS); 
         do
-            [ $p = "/usr/local/bin" ] && echo "$(TT blue; TT bold)$p$(TT white; TT normal)" || echo $p
+            [ $p = "/usr/local/bin" ] && printf "  $(TT blue; TT bold)$p$(TT white; TT normal)\n" || printf "  $p\n"
         done
         
-        printf "Deploy it using the recommended command from the current directory:\n\n"
-        printf "\t$(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"
+        printf "\n"
+        printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) Deploy it using the recommended command from the current directory:\n\n"
+        printf "  $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"
     else
-        printf "Seems that this script is already deployed on this system!\n"
-        printf "Check it out where it is deployed:\n\n"
-        printf "\t$(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n\n"
-        # DEPLOYED=$(shasum $(which $THIS) | awk '{print $1}')
-        # ACTUAL=$(shasum $(echo $0) | awk '{print $1}')
-
-        # [ $DEPLOYED = $ACTUAL ] && \
-        #     printf "Nice, the actual deployment $(TT green; TT bold)is the same$(TT white; TT normal) \
-        #     \nas the one available on this repo directory!\n\n" || \
-        #     printf "Hum, the actual deployment $(TT yellow; TT bold)is diffent$(TT white; TT normal) \
-        #     \nthan the one available on this repo directory! \
-        #     \nYou can re-deploy it by running: \
-        #     \n\n\t$(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"
+        # printf "Seems that this script is already deployed on this system!\n"
+        # printf "Check it out where it is deployed:\n\n"
+        # printf "  $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n\n"
         CheckThisScriptVersion
     fi 
 }
@@ -301,7 +295,7 @@ while getopts $OPTIONS option; do
          Help
          exit;;
       s) # set active pipeline
-         Set $OPTARG
+         gitSync $OPTARG
          exit;;
       d) # deploy script to the /usr/local/bin
         Check
