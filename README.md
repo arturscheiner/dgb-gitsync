@@ -98,7 +98,7 @@ h	Show this help information
 	E.g. -> dgb-gs -h
 ```
 
-### Obs: These two options just work when running ./dgb-gs inside the repo cloned folder.
+### Obs: This options just work when running ./dgb-gs inside the repo cloned folder.
 
 ```
 about this script
