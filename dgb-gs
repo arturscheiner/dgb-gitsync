@@ -216,23 +216,23 @@ CheckThisScriptVersion()
 
   if [ $DEPLOYED = $ACTUAL ]
   then
-    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) This script is already installed on your system: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script is already deployed on your system: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
   else
-    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) This script is different than the version installed: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script is different than the version deployed: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
   fi
 
   if [ $DEPLOYED = $ONLINE ]
   then
-    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) This script is the same available on its repo: $(TT blue; TT bold)$ONLINE_PATH$(TT white; TT normal)\n"
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script deployed is the same available on its repo: $(TT blue; TT bold)$ONLINE_PATH$(TT white; TT normal)\n"
   else
-    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) This script is different than the version available on its repo: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) This script deployed is different than the one available on its repo: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
   fi
 
   if [ $ACTUAL = $ONLINE ]
   then
-    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) This script is already installed on your system: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script on this folder is the same available on its repo: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
   else
-    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) This script is different than the version installed: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script on this folder is different than the one available on its repo: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
   fi
 }
 
