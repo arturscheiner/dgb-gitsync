@@ -225,9 +225,9 @@ CheckThisScriptVersion()
   if [[ $0 == ./* ]]; then    
     if [ $ACTUAL = $ONLINE ]
     then
-    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script on this folder is the same available on its repo: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script on this folder is the same available on its repo: $(TT blue; TT bold)$REPO_PATH$(TT white; TT normal)\n"
     else
-    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script on this folder is different than the one available on its repo: $(TT green; TT bold)$REPO_PATH$(TT white; TT normal)\n"    
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script on this folder is different than the one available on its repo: $(TT green; TT bold)git pull$(TT white; TT normal)\n"    
     fi
   fi
 
