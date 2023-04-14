@@ -33,11 +33,14 @@ dgb-gs -c
 ```
 dgb-gs -a https://github.com/arturscheiner/digibee-pipeline-name.git
 ```
-8)  Get some HELP
+8) Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm and must have the same name of its git repo 
+```
+dgb-gs -s digibee-pipeline-name
+```
+1)  Get some HELP
 ```
 dgb-gs -h
 ```
-
 ```
 Help Information
 
