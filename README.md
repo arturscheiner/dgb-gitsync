@@ -1,17 +1,17 @@
-## Digibeectl Git Sync
+# Digibeectl Git Sync
 
-**This script allows you easily sync a pipeline ..**
-**Before using it, make sure you have digibeectl installed on your computer**
+This script allows you easily sync a Digibee pipeline with a git repo
 
-Synchronizing Digibee Pipelines with Git: An Essential Integration for CI/CD
 
-Introduction
+## Synchronizing Digibee Pipelines with Git: An Essential Integration for CI/CD
+
+### Introduction
 
 Digibee is a cloud-native, low-code integration platform that enables enterprises to automate and streamline their business processes. A key feature of Digibee is its pipeline-based approach to integration, where pipelines represent end-to-end workflows that connect applications, data sources, and other systems.
 
 However, as with any software development process, it is important to have version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes are managed effectively and deployed consistently. This is where Git comes in.
 
-Why Synchronize Digibee Pipelines with Git?
+### Why Synchronize Digibee Pipelines with Git?
 
 There are several reasons why synchronizing Digibee pipelines with Git is important:
 
@@ -30,10 +30,11 @@ Finally, synchronizing Digibee pipelines with Git enables teams to integrate the
 
 This can help catch errors and issues early on in the development process, reducing the risk of bugs or downtime in production.
 
-Conclusion
+### Conclusion
 
 In conclusion, synchronizing Digibee pipelines with Git is an essential integration for any team using Digibee for their integration needs. By leveraging Git's version control, collaboration, and CI/CD integration capabilities, teams can ensure that their integrations are managed effectively and deployed consistently.
 
+**Before using it, make sure you have digibeectl installed on your computer**
 
 1) Install digibeectl on your MAC or LINUX computer as described on [Digibeectl Official Documentation](https://intercom.help/godigibee/en/articles/5214735-digibeectl-use-guide).
 ```
