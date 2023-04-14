@@ -14,26 +14,31 @@ isLocal()[[ $0 == ./* ]]
 THIS=$(echo $0 | awk -F'/' '{print $(NF)}')
 CONFIG_FILE=~/.digibeectl/config.json
 DGB_GS_DIR=~/.$THIS
+DGB_GS_CACHE=$DGB_GS_DIR/cache
+DGB_GS_PIPES=$DGB_GS_DIR/pipelines
 USER_PATHS=$(echo ${PATH//:/ })
 
 isLocal && THIS_TYPE="$0" || THIS_TYPE="$THIS"
 
 Init()
 {
-    mkdir -p $DGB_GS_DIR
+    mkdir -p $DGB_GS_DIR $DGB_GS_CACHE $DGB_GS_PIPES
+    
 
-    if [ ! -z "$(ls -A $DGB_GS_DIR)" ]; then
-        chmod 444 $DGB_GS_DIR/*
-    fi 
+    # if [ ! -z "$(ls -A $DGB_GS_DIR)" ]; then
+    #     chmod 444 $DGB_GS_DIR/*
+    # fi 
 }
+
+
 
 gitSync()
 {
 PIPE_NAME=$1
 BASE_PATH=$HOME/.dgb-gs
-mkdir -p $BASE_PATH/$PIPE_NAME
+mkdir -p $DGB_GS_PIPES/$PIPE_NAME
 
-PIPE_PATH="$BASE_PATH/$PIPE_NAME"
+PIPE_PATH="$DGB_GS_PIPES/$PIPE_NAME"
 PIPE_JSON="$PIPE_PATH/flowspec.json"
 PIPE_LINE=$(digibeectl get pipeline -n $PIPE_NAME | awk 'NR==2')
 
@@ -63,6 +68,8 @@ cat <<EOT > $PIPE_PATH/version.json
 }
 EOT
 
+CreateReadme $PIPE_NAME
+
 cd $PIPE_PATH
 git add .
 git commit -m "Version $PIPE_VERSION.$PIPE_CHECKSUM"
@@ -75,13 +82,13 @@ git push
 Help()
 {
     Title "Help Information"
-    printf "Syntax: $(TT bold)$THIS_TYPE [-a|l|r|s|u|c|d|h] params$(TT normal)\n\n"
+    printf "Syntax: $(TT bold)$THIS_TYPE [-a|l|r|s|c|d|h] params$(TT normal)\n\n"
     printf "$(TT yellow)about pipeline stuff$(TT white)\n"
-    printf "a\tAdd a new pipeline to the switch list\n\tE.g. -> $(TT green)$THIS_TYPE -a$(TT white)\n\n"
+    printf "a\tAdd a new pipeline git repo to the git sync list\n\tE.g. -> $(TT green)$THIS_TYPE -a $(TT underline)git@bitbucket.org:arturscheiner/pipeline-name.git$(TT normal; TT white)\n\n"
     printf "l\tList all the pipelines configured\n\tE.g. -> $(TT green)$THIS_TYPE -l$(TT white)\n\n"
-    printf "r\tRemove a pipeline from the switch list\n\tE.g. -> $(TT green)$THIS_TYPE -r $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
-    printf "s\tSync a pipeline with a git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
-    printf "u\tUnset the active pipeline\n\tE.g. -> $(TT green)$THIS_TYPE -u$(TT normal; TT white)\n\n"
+    printf "r\tRemove a pipeline from the pipeline list\n\tE.g. -> $(TT green)$THIS_TYPE -r $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
+    printf "s\tSync a pipeline with its git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
+    # printf "z\tUnset the active pipeline\n\tE.g. -> $(TT green)$THIS_TYPE -u$(TT normal; TT white)\n\n"
    
    printf "$(TT yellow)about this script$(TT white)\n"
    printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
@@ -266,6 +273,82 @@ Deploy()
     sudo cp $0 $TO_PATH
 }
 
+addPipeGitRepo()
+{
+  PIPE_REPO=$1
+  cd $DGB_GS_PIPES
+  git clone $PIPE_REPO
+  cd - 
+}
+
+List()
+{
+    Title "List configured pipelines"
+    echo "The pipelines listed bellow are ready to be synched:"
+    echo 
+    ListPipelines
+    echo
+}
+
+ListPipelines()
+{
+    ACTIVE_REALM=$(digibeectl get config | grep realm | awk '{print $2}')
+
+    for c in $(ls $DGB_GS_PIPES); do
+        [[ $c == $ACTIVE_REALM ]] && printf "\t$(TT bold; TT green)- $c (active)$(TT normal)\n" || printf "\t- $c\n"       
+    done
+    echo
+}
+
+CreateReadme()
+{
+  PIPE_NAME=$1
+  PIPE_REPO_README=$DGB_GS_PIPES/$PIPE_NAME/README.md
+  printf "## This is the pipeline $PIPE_NAME README:\n" > $PIPE_REPO_README
+  CreatePipelineTree $PIPE_NAME >> $PIPE_REPO_README
+}
+
+CountPipelineLength()
+{
+ echo ""
+}
+
+CreatePipelineTree()
+{
+  PIPE_NAME=$1
+  printf "## This is the pipeline components tree:\n"
+  printf "\`\`\`bash\n"
+  cat $DGB_GS_PIPES/$PIPE_NAME/flowspec.json | jq '.start[] | (.stepName)' | jq -r 
+  printf "\`\`\`\n"
+}
+
+CheckSubTree()
+{
+ PIPE_NAME=$1
+ TYPES="choice"
+
+ EXPAND_TYPE=$(cat $DGB_GS_PIPES/$PIPE_NAME/flowspec.json | jq '.start[] | select(.type=="choice")')
+ 
+ printf "## This is the pipeline component choice:\n"
+  printf "\`\`\`bash\n"
+  cat $DGB_GS_PIPES/$PIPE_NAME/flowspec.json | jq '.start[] | (.stepName)' | jq -r 
+  printf "\`\`\`\n"
+}
+
+CheckChoiceTypeConnector()
+{
+  PIPE_NAME=$1
+  TYPE="choice"
+}
+
+CheckBlockTypeConnectors()
+{
+  PIPE_NAME=$1
+  CONNECTOR_NAMES="for-each-connector"
+  PIPE_REPO_FLOWSPEC=$DGB_GS_DIR/$PIPE_NAME/flowspec.json
+  LIST=$(jq '.start[] | select(.type=="choice") | {when} | .when[] | {target}' $PIPE_REPO_FLOWSPEC)
+}
+
 ############################################################
 # Main program                                             #
 ############################################################
@@ -284,12 +367,12 @@ printf "$(TT magenta)Digibee$(TT white) Git Sync $VERSION\n\n"
 OPTERR=0
 OPTION=$1
 
-isLocal && OPTIONS="hlcaus:r:d:" || OPTIONS="hlaus:r:"
+isLocal && OPTIONS="hlca:s:r:d:" || OPTIONS="hlca:s:r:"
 
 while getopts $OPTIONS option; do
    case $option in
       a) # config
-         Add
+         addPipeGitRepo $OPTARG
          exit;;
       h) # display Help
          Help
@@ -298,7 +381,7 @@ while getopts $OPTIONS option; do
          gitSync $OPTARG
          exit;;
       d) # deploy script to the /usr/local/bin
-        Check
+        #Check
         Deploy $OPTARG
          exit;;
       l) # list script
