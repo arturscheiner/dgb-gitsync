@@ -2,21 +2,20 @@
 
 This script allows you easily sync a Digibee pipeline with a git repo
 
-
 ## Synchronizing Digibee Pipelines with Git: An Essential Integration for CI/CD
 
 ### Introduction
 
 Digibee is a cloud-native, low-code integration platform that enables enterprises to automate and streamline their business processes. A key feature of Digibee is its pipeline-based approach to integration, where pipelines represent end-to-end workflows that connect applications, data sources, and other systems.
 
-However, as with any software development process, it is important to have version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes are managed effectively and deployed consistently. This is where Git comes in.
+However, as with any software development process, it is important to have version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes made on pipelines are managed effectively and deployed consistently. This is where Git comes in.
 
 ### Why Synchronize Digibee Pipelines with Git?
 
 There are several reasons why synchronizing Digibee pipelines with Git is important:
 
 1. Version Control
-Git is a powerful version control system that allows teams to manage changes to their codebase over time. By synchronizing Digibee pipelines with Git, teams can track changes to their integrations, including who made the changes, when they were made, and what changes were made.
+Although Digibee's platform provides developers with its own version control management, Git gives that extra-layer allowing a more granullar and powerful sub-version control system that allows teams to manage changes to their pipelines flowSpecs over time. By synchronizing Digibee pipelines with Git, teams can track changes to their integrations, including who made the changes, when they were made, and what changes were made.
 
 This is especially important when working with large, complex integrations, where multiple team members may be making changes simultaneously. Having a centralized repository for all pipeline changes can help prevent conflicts and ensure that changes are made in a controlled, organized manner.
 
