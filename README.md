@@ -77,24 +77,24 @@ dgb-gs -h
 ```
 Help Information
 
-Syntax: ./dgb-gs [-a|l|r|s|c|d|h] params
+Syntax: dgb-gs [-a|l|r|s|c|d|h] params
 
 about pipeline stuff
 a	Add a new pipeline git repo to the git sync list
-	E.g. -> ./dgb-gs -a git@bitbucket.org:arturscheiner/pipeline-name.git
+	E.g. -> dgb-gs -a git@bitbucket.org:arturscheiner/pipeline-name.git
 
 l	List all the pipelines configured
-	E.g. -> ./dgb-gs -l
+	E.g. -> dgb-gs -l
 
 r	Remove a pipeline from the pipeline list
-	E.g. -> ./dgb-gs -r pipeline-name
+	E.g. -> dgb-gs -r pipeline-name
 
 s	Sync a pipeline with its git repo
-	E.g. -> ./dgb-gs -s pipeline-name
+	E.g. -> dgb-gs -s pipeline-name
 
 about this script
 c	Check this script deployment
-	E.g. -> ./dgb-gs -c
+	E.g. -> dgb-gs -c
 
 about anything else
 h	Show this help information
