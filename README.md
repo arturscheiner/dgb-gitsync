@@ -1,4 +1,4 @@
-# Digibeectl Git Sync
+# Dgb Git Sync
 
 This bash script allows you to easily sync a Digibee pipeline with a git repo. It works by automating some tasks that can be done purelly with Digibeectl (Digibee Official CLI) and Git Tools.
 
