@@ -1,6 +1,6 @@
 # Digibeectl Git Sync
 
-This script allows you easily sync a Digibee pipeline with a git repo
+This script allows you to easily sync a Digibee pipeline with a git repo
 
 ## Synchronizing Digibee Pipelines with Git: An Essential Integration for CI/CD
 
@@ -15,16 +15,16 @@ However, as with any software development process, it is important to have versi
 There are several reasons why synchronizing Digibee pipelines with Git is important:
 
 1. Version Control
-Although Digibee's platform provides developers with its own version control management, Git gives that extra-layer allowing a more granullar and powerful sub-version control system that allows teams to manage changes to their pipelines flowSpecs over time. By synchronizing Digibee pipelines with Git, teams can track changes to their integrations, including who made the changes, when they were made, and what changes were made.
+Although Digibee's platform provides developers with an excelent version control management, integrating it with Git can give that extra-layer of governance. This approach gives developers with a granullar and powerful sub-version control system that allows teams to follow the changes to their pipelines flowSpecs over time. By synchronizing Digibee pipelines flowSpec with Git, teams can track changes to their integrations, including who made the changes, when they were made, and what changes were made.
 
-This is especially important when working with large, complex integrations, where multiple team members may be making changes simultaneously. Having a centralized repository for all pipeline changes can help prevent conflicts and ensure that changes are made in a controlled, organized manner.
+This is especially important when working with large, complex integrations, where multiple team members may be making changes to the pipelines. Having a centralized repository for all pipeline changes can help prevent conflicts and ensure that changes are made in a controlled, organized manner.
 
-2. Collaboration
-Git also enables collaboration between team members, allowing them to work together on the same codebase without stepping on each other's toes. By using Git's branching and merging capabilities, teams can work on different features or fixes in isolation, and then merge their changes back into the main codebase once they are complete.
+1. Collaboration
+Git also enables collaboration between team members, allowing them to work together on the same codebase without stepping on each other's toes.
 
 This can greatly increase productivity and efficiency, as team members can work on their own parts of the integration without interfering with each other's work.
 
-3. CI/CD Integration
+1. CI/CD Integration
 Finally, synchronizing Digibee pipelines with Git enables teams to integrate their pipelines with CI/CD tools like Jenkins, CircleCI, or Travis CI. By triggering pipeline runs automatically whenever changes are pushed to the Git repository, teams can ensure that their integrations are continuously tested and deployed.
 
 This can help catch errors and issues early on in the development process, reducing the risk of bugs or downtime in production.
