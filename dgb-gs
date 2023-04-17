@@ -23,11 +23,6 @@ isLocal && THIS_TYPE="$0" || THIS_TYPE="$THIS"
 Init()
 {
     mkdir -p $DGB_GS_DIR $DGB_GS_CACHE $DGB_GS_PIPES
-    
-
-    # if [ ! -z "$(ls -A $DGB_GS_DIR)" ]; then
-    #     chmod 444 $DGB_GS_DIR/*
-    # fi 
 }
 
 
