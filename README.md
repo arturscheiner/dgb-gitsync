@@ -1,6 +1,6 @@
 # Digibeectl Git Sync
 
-This script allows you to easily sync a Digibee pipeline with a git repo
+This bash script allows you to easily sync a Digibee pipeline with a git repo. It works by automating some tasks that can be done purelly with Digibeectl (Digibee Official Commandline Utility) and Git Tools.
 
 ## Synchronizing Digibee Pipelines with Git: An Essential Integration for CI/CD
 
@@ -8,7 +8,7 @@ This script allows you to easily sync a Digibee pipeline with a git repo
 
 Digibee is a cloud-native, low-code integration platform that enables enterprises to automate and streamline their business processes. A key feature of Digibee is its pipeline-based approach to integration, where pipelines represent end-to-end workflows that connect applications, data sources, and other systems.
 
-However, as with any software development process, it is important to have version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes made on pipelines are managed effectively and deployed consistently. This is where Git comes in.
+However, as with any software development process, it is important to have version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes made on pipelines are tracked effectively, approved and deployed consistently. This is where the integration with Git comes in.
 
 ### Why Synchronize Digibee Pipelines with Git?
 
@@ -19,12 +19,7 @@ Although Digibee's platform provides developers with an excelent version control
 
 This is especially important when working with large, complex integrations, where multiple team members may be making changes to the pipelines. Having a centralized repository for all pipeline changes can help prevent conflicts and ensure that changes are made in a controlled, organized manner.
 
-1. Collaboration
-Git also enables collaboration between team members, allowing them to work together on the same codebase without stepping on each other's toes.
-
-This can greatly increase productivity and efficiency, as team members can work on their own parts of the integration without interfering with each other's work.
-
-1. CI/CD Integration
+2. CI/CD Integration
 Finally, synchronizing Digibee pipelines with Git enables teams to integrate their pipelines with CI/CD tools like Jenkins, CircleCI, or Travis CI. By triggering pipeline runs automatically whenever changes are pushed to the Git repository, teams can ensure that their integrations are continuously tested and deployed.
 
 This can help catch errors and issues early on in the development process, reducing the risk of bugs or downtime in production.
