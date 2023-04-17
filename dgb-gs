@@ -25,8 +25,6 @@ Init()
     mkdir -p $DGB_GS_DIR $DGB_GS_CACHE $DGB_GS_PIPES
 }
 
-
-
 gitSync()
 {
 PIPE_NAME=$1
