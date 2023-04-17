@@ -6,6 +6,10 @@ This bash script allows you to easily sync a Digibee pipeline with a git repo.
 
 This script is not developed, maintained or supported by [Digibee](https://www.digibee.com). It works by automating some tasks that can be done purelly with Digibeectl (Digibee Official CLI) and Git Tools.
 
+## License
+
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
+
 ## Synchronizing Digibee Pipelines with Git: An Essential Integration for CI/CD
 
 ### Introduction
