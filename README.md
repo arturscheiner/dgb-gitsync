@@ -16,7 +16,7 @@ See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
 
 Digibee is a cloud-native, low-code integration platform that enables enterprises to automate and streamline their business processes. A key feature of Digibee is its pipeline-based approach to integration, where pipelines represent end-to-end workflows that connect applications, data sources, and other systems.
 
-However, as with any software development process, it is important to have version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes made on pipelines are tracked effectively, approved and deployed consistently. This is where the integration with Git comes in.
+However, as with any software development process, it is, sometimes, important to have an external version control and continuous integration/continuous deployment (CI/CD) in place to ensure that changes made on pipelines are tracked effectively, approved and deployed consistently. This is where the integration with Git comes in.
 
 ### Why Synchronize Digibee Pipelines with Git?
 
@@ -34,7 +34,7 @@ This can help catch errors and issues early on in the development process, reduc
 
 ### Conclusion
 
-In conclusion, synchronizing Digibee pipelines with Git is an essential integration for any team using Digibee for their integration needs. By leveraging Git's version control, collaboration, and CI/CD integration capabilities, teams can ensure that their integrations are managed effectively and deployed consistently.
+In conclusion, synchronizing Digibee pipelines with Git is a good practice for any team using Digibee low-code platform to write integration code and have some kind of Git platform supporting its CI/CD strategy needs. By leveraging Git's version control, collaboration, and CI/CD integration capabilities, teams can ensure that their integrations are managed effectively and deployed consistently.
 
 **Before using it, make sure you have digibeectl installed on your computer**
 
@@ -42,31 +42,31 @@ In conclusion, synchronizing Digibee pipelines with Git is an essential integrat
 ```
 curl -s https://storage.googleapis.com/digibee-release-test/releases/install.sh | bash
 ```
-2) Configure digibeectl on your MAC or LINUX computer as described on [Digibeectl Official Documentation](https://intercom.help/godigibee/en/articles/5214735-digibeectl-use-guide).
+1) Configure digibeectl on your MAC or LINUX computer as described on [Digibeectl Official Documentation](https://intercom.help/godigibee/en/articles/5214735-digibeectl-use-guide).
 ```
 digibeectl set config --file "path/file.json" --secret-key "encryption-key" --auth-key "encryption-passphrase"
 ```
-3) Clone this repo on your MAC or LINUX computer
+1) Clone this repo on your MAC or LINUX computer
 ```
 git clone https://github.com/arturscheiner/dgb-gitsync.git
 ```
-4) Access the cloned directory "dgb-gitsync"
+1) Access the cloned directory "dgb-gitsync"
 ```
 cd ./dgb-gitsync
 ```
-5) From inside the cloned directory, deploy this script in your $PATH. On this step the script will copy itself to the directory specified as a parameter. The directory must be a $PATH directory, otherwise you will not be able to run the command anywhere in your workstation, without the "./" in front of it.
+1) From inside the cloned directory, deploy this script in your $PATH. On this step the script will copy itself to the directory specified as a parameter. The directory must be a $PATH directory, otherwise you will not be able to run the command anywhere in your workstation, without the "./" in front of it.
 ```
 sudo ./dgb-gs -d /usr/local/bin
 ```
-6) Check if your system complies with all dependencies need for this script to run without errors
+1) Check if your system complies with all dependencies need for this script to run without errors
 ```
 dgb-gs -c
 ```
-7) Add a digibee pipeline git repo to be managed by this script. PS: Before adding a pipeline repo, you must create one on your preferred git platform
+1) Add a digibee pipeline git repo to be managed by this script. PS: Before adding a pipeline repo, you must create one on your preferred git platform
 ```
 dgb-gs -a https://github.com/arturscheiner/digibee-pipeline-name.git
 ```
-8) Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm and must have the same name of its git repo 
+1) Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm and must have the same name of its git repo 
 ```
 dgb-gs -s digibee-pipeline-name
 ```
