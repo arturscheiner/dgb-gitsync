@@ -2,7 +2,7 @@
 
 # Project: Digibee Git Sync
 HASH_VERSION=$(shasum $(echo $0) | awk '{print substr($1,0,5)}')
-VERSION="v0.1.0.$HASH_VERSION"
+VERSION="v0.1.1.$HASH_VERSION"
 # Written by: Artur Scheiner
 # Email: artur.scheiner@gmail.com
 
@@ -69,6 +69,39 @@ git commit -m "Version $PIPE_VERSION.$PIPE_CHECKSUM"
 git push
 }
 
+Watch()
+{
+    PIPE_NAME=$1
+    PIPE_LINE=$(digibeectl get pipeline -n $PIPE_NAME | awk 'NR==2')
+
+    IFS=" " read -r -a PIPE_INFO <<< "$PIPE_LINE"
+
+    PIPE_ID=${PIPE_INFO[1]}
+    PIPE_VERSION=${PIPE_INFO[2]}
+
+    echo "Sync - $PIPE_NAME"
+    echo "Pipeline ID - $PIPE_ID"
+    echo "Pipeline Version = $PIPE_VERSION"
+
+    while true
+    do
+      VALUE_A=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
+      sleep 5
+      VALUE_B=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
+      if [ $VALUE_A != $VALUE_B ]
+      then
+        echo "different"
+        $THIS -s $PIPE_NAME > /dev/null &
+        THIS_PID=$!
+        echo $THIS_PID
+        if ps $THIS_PID > /dev/null ; then
+            echo -n "sync is running "
+        fi
+      fi
+      sleep 5
+    done
+}
+
 ############################################################
 # Functions                                                #
 ############################################################
@@ -81,7 +114,7 @@ Help()
     printf "l\tList all the pipelines configured\n\tE.g. -> $(TT green)$THIS_TYPE -l$(TT white)\n\n"
     printf "r\tRemove a pipeline from the pipeline list\n\tE.g. -> $(TT green)$THIS_TYPE -r $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
     printf "s\tSync a pipeline with its git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
-    # printf "z\tUnset the active pipeline\n\tE.g. -> $(TT green)$THIS_TYPE -u$(TT normal; TT white)\n\n"
+    printf "w\tWatch and sync if a pipeline changes\n\tE.g. -> $(TT green)$THIS_TYPE -w $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
    
    printf "$(TT yellow)about this script$(TT white)\n"
    printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
@@ -136,6 +169,14 @@ TT()
             ;;
     esac
 }
+
+spin() {
+   local -a marks=( '/' '-' '\' '|' )
+   while [[ 1 ]]; do
+     printf '%s\r' "${marks[i++ % ${#marks[@]}]}"
+     sleep 1
+   done
+ }
 
 callForHelp(){ 
     printf "Check the help by running:\n\n\t$(TT green; TT bold)$THIS_TYPE -h$(TT normal)\n\n"
@@ -380,7 +421,7 @@ printf "$(TT magenta)Digibee$(TT white) Git Sync $VERSION\n\n"
 OPTERR=0
 OPTION=$1
 
-isLocal && OPTIONS="hlca:s:r:d:" || OPTIONS="hlca:s:r:"
+isLocal && OPTIONS="hlca:s:r:d:w:" || OPTIONS="hlca:s:r:w:"
 
 while getopts $OPTIONS option; do
    case $option in
@@ -405,6 +446,10 @@ while getopts $OPTIONS option; do
          exit;;
       u) # unset active pipeline
          Unset
+         echo
+         exit;;
+      w) # unset active pipeline
+         Watch $OPTARG
          echo
          exit;;
     c) # unset active pipeline
