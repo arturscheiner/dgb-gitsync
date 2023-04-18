@@ -92,7 +92,7 @@ Watch()
         $THIS -s $PIPE_NAME
         HASH_A=$HASH_B
       fi
-      sleep 1
+      sleep 5
     done
 }
 
