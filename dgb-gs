@@ -114,7 +114,7 @@ Help()
     printf "l\tList all the pipelines configured\n\tE.g. -> $(TT green)$THIS_TYPE -l$(TT white)\n\n"
     printf "r\tRemove a pipeline from the pipeline list\n\tE.g. -> $(TT green)$THIS_TYPE -r $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
     printf "s\tSync a pipeline with its git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
-    printf "w\tWatch and sync if a pipeline changes\n\tE.g. -> $(TT green)$THIS_TYPE -w $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
+    printf "w\tWatch and sync when a pipeline changes\n\tE.g. -> $(TT green)$THIS_TYPE -w $(TT underline)pipeline-name$(TT normal; TT white)\n\n"
    
    printf "$(TT yellow)about this script$(TT white)\n"
    printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
