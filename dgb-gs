@@ -91,15 +91,14 @@ Watch()
       if [ $VALUE_A != $VALUE_B ]
       then
         echo "different"
-        $THIS -s $PIPE_NAME > /dev/null &
-        THIS_PID=$!
-        echo $THIS_PID
-        if ps $THIS_PID > /dev/null ; then
-            echo -n "sync is running "
-        fi
+        $THIS -s $PIPE_NAME
+        # THIS_PID=$!
+        # echo $THIS_PID
+        # if ps $THIS_PID > /dev/null ; then
+        #     echo -n "sync is running"
+        # fi
       fi
       sleep 1
-      VALUE_A=$VALUE_B
     done
 }
 
