@@ -99,6 +99,7 @@ Watch()
         fi
       fi
       sleep 1
+      VALUE_A=$VALUE_B
     done
 }
 
