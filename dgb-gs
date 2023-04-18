@@ -86,7 +86,7 @@ Watch()
     while true
     do
       VALUE_A=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
-      sleep 5
+      sleep 1
       VALUE_B=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
       if [ $VALUE_A != $VALUE_B ]
       then
@@ -98,7 +98,7 @@ Watch()
             echo -n "sync is running "
         fi
       fi
-      sleep 5
+      sleep 1
     done
 }
 
