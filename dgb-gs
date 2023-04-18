@@ -90,11 +90,6 @@ Watch()
       then
         echo "different"
         $THIS -s $PIPE_NAME
-        # THIS_PID=$!
-        # echo $THIS_PID
-        # if ps $THIS_PID > /dev/null ; then
-        #     echo -n "sync is running"
-        # fi
         HASH_A=$HASH_B
       fi
       sleep 1
