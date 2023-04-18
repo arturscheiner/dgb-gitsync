@@ -82,13 +82,11 @@ Watch()
     echo "Sync - $PIPE_NAME"
     echo "Pipeline ID - $PIPE_ID"
     echo "Pipeline Version = $PIPE_VERSION"
-
+    HASH_A=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
     while true
     do
-      VALUE_A=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
-      sleep 1
-      VALUE_B=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
-      if [ $VALUE_A != $VALUE_B ]
+      HASH_B=$(digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | shasum - | awk '{print $1}')
+      if [ $HASH_A != $HASH_B ]
       then
         echo "different"
         $THIS -s $PIPE_NAME
@@ -97,6 +95,7 @@ Watch()
         # if ps $THIS_PID > /dev/null ; then
         #     echo -n "sync is running"
         # fi
+        HASH_A=$HASH_B
       fi
       sleep 1
     done
