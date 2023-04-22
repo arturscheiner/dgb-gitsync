@@ -91,6 +91,9 @@ r	Remove a pipeline from the pipeline list
 
 s	Sync a pipeline with its git repo
 	E.g. -> dgb-gs -s pipeline-name
+	
+w	Watch and sync when a pipeline changes
+	E.g. -> dgb-gs -w pipeline-name
 
 about this script
 c	Check this script deployment
