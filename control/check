@@ -123,7 +123,7 @@ CheckThisScript()
         
         printf "\n"
         printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) Deploy it using the recommended command from the current directory:\n\n"
-        printf "  $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"
+        printf "  $(TT green; TT bold)sudo $0 -i /usr/local/bin$(TT white; TT normal)\n"
     else
         # printf "Seems that this script is already deployed on this system!\n"
         # printf "Check it out where it is deployed:\n\n"
@@ -145,7 +145,7 @@ CheckThisScriptVersion()
   then
     printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script is already deployed on your system: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
   else
-    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script is different than the version deployed: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script is different than the version deployed: $(TT green; TT bold)sudo $0 -i /usr/local/bin$(TT white; TT normal)\n"    
   fi
 
   if [[ $0 == ./* ]]; then    

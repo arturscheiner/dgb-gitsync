@@ -74,6 +74,5 @@ copyModelToOptFolder()
 linkModelScriptToInstallFolder()
 {
     INSTALL_FOLDER=$1
-    echo $INSTALL_FOLDER
     ln -sf /opt/dgb-tools/dgb-gs/dgb-gs $INSTALL_FOLDER/dgb-gs
 }

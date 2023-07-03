@@ -3,7 +3,6 @@
 installControl()
 {
     local INSTALL_FOLDER=$1
-    echo $INSTALL_FOLDER
     removeModelOptFolder
     createModelOptFolder
     copyModelToOptFolder
