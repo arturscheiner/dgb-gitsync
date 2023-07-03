@@ -1,13 +1,26 @@
 #!/bin/bash
 
+installControl()
+{
+    local INSTALL_FOLDER=$1
+    echo $INSTALL_FOLDER
+    removeModelOptFolder
+    createModelOptFolder
+    copyModelToOptFolder
+
+    linkModelScriptToInstallFolder $INSTALL_FOLDER
+}
+
 Deploy()
 {
     Title "Deploy this script to a directory"
     echo "Sugested path is /usr/local/bin"
 
+    git clone -b xplorer 
+
     echo $0
     TO_PATH=$1
-
+    
     chmod +x $0
 
     if [ -f $TO_PATH/$THIS ]; then

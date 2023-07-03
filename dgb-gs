@@ -15,7 +15,7 @@ THIS_SCRIPT=$(readlink -f "$0")
 
 # Absolute path this script is in, thus /home/user/bin
 SCRIPTPATH=$(dirname "$THIS_SCRIPT")
-echo $THIS_SCRIPT
+
 # This script name
 ME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 

@@ -26,6 +26,11 @@ optionView-b()
     fi
 }
 
+optionView-i()
+{
+    installView $INSTALL_FOLDER
+}
+
 optionView-l()
 {
     listView

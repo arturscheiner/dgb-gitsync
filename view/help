@@ -15,7 +15,7 @@ Help()
    printf "$(TT yellow)about this script$(TT white)\n"
    printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
     if [[ $0 == ./* ]]; then    
-        printf "d\tDeploy this script into a directory\n\tE.g. -> $(TT green)sudo $THIS_TYPE -d /usr/local/bin$(TT white)\n\n"
+        printf "i\tInstall this script into a directory\n\tE.g. -> $(TT green)sudo $THIS_TYPE -i /usr/local/bin$(TT white)\n\n"
     fi
 
     printf "$(TT yellow)about anything else$(TT white)\n"  

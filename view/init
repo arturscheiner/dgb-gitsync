@@ -9,7 +9,7 @@ initViewMain(){
     OPTERR=0
     OPTION=$1
 
-    isLocal && OPTIONS="hlca:b:s:r:d:v:w:" || OPTIONS="hlca:s:r:w:"
+    isLocal && OPTIONS="hlca:b:s:r:i:v:w:" || OPTIONS="hlca:s:r:w:"
 
     while getopts $OPTIONS option; do
     case $option in
@@ -33,10 +33,11 @@ initViewMain(){
             local PIPELINE=$OPTARG
             local MAINOPT=$option
             ;;
-        d) # deploy script to the /usr/local/bin
+        i) # deploy script to the /usr/local/bin
             #Check
-            Deploy $OPTARG
-            exit;;
+            INSTALL_FOLDER=$OPTARG
+            local MAINOPT=$option
+            ;;
         l) # list script
             local MAINOPT=$option
             ;;

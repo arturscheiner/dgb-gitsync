@@ -1,0 +1,9 @@
+#!/bin/bash
+
+installView()
+{
+
+    INSTALL_FOLDER=$1
+    echo $INSTALL_FOLDER
+    installControl $INSTALL_FOLDER
+}
