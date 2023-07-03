@@ -1,0 +1,20 @@
+#!/bin/bash
+
+addView()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    if checkControlAddedPipeline $PIPELINE $MAJ_VERSION; then
+        Info "the pipeline already exists"
+    else
+        if checkControlPipeline $PIPELINE $MAJ_VERSION; then
+            addControlPipeline $PIPELINE $MAJ_VERSION
+            Success "the pipeline $(TT blue; TT underline)$PIPELINE$(TT normal) with the major version $(TT blue; TT underline)$MAJ_VERSION$(TT normal) was added to the configured list"
+        else
+            Error "the pipeline $(TT blue; TT underline)$PIPELINE$(TT normal) with the major version $(TT blue; TT underline)$MAJ_VERSION$(TT normal) does'nt exist on this realm"
+        fi
+    fi
+
+    listView
+}

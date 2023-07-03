@@ -1,0 +1,18 @@
+#!/bin/bash
+
+Deploy()
+{
+    Title "Deploy this script to a directory"
+    echo "Sugested path is /usr/local/bin"
+
+    echo $0
+    TO_PATH=$1
+
+    chmod +x $0
+
+    if [ -f $TO_PATH/$THIS ]; then
+        sudo rm $TO_PATH/$THIS
+    fi
+
+    sudo cp $0 $TO_PATH
+}

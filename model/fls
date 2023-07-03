@@ -1,0 +1,57 @@
+#!/bin/bash
+
+initFileSystem()
+{
+    createMainFolders
+}
+
+createMainFolders()
+{
+    mkdir -p $DGB_GS_DIR $DGB_GS_CACHE $DGB_GS_PIPES
+}
+
+createModelPipelineFolder()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    mkdir -p $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION
+}
+
+deleteModelPipelineFolder()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    rm -Rf $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION
+}
+
+listModelPipelinesFolder()
+{
+    local ACTIVE_REALM=$(digibeectl get config | grep realm | awk '{print $2}')
+
+    for c in $(ls $DGB_GS_PIPES); do
+        local GITREPO=$(getModelGitPipelineConfigUrl $c)
+        [[ ! -z "$GITREPO" ]] && printf "\t$(TT bold; TT green)- $c (binded)$(TT normal): $GITREPO\n" || printf "\t$(TT bold; TT orange)- $c (not binded)$(TT normal): ---\n"       
+    done
+    echo
+}
+
+getModelPipelineFolder()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    local PIPELINEFOLDER=$(ls $DGB_GS_PIPES | grep "$PIPELINE-v$MAJ_VERSION")
+
+    echo $PIPELINEFOLDER
+}
+
+getModelPipelineBindedGitRepo()
+{
+    local PIPELINECONFIG=$1
+
+    local GITREPO=$(cat $DGB_GS_PIPES/$PIPELINECONFIG/.git/config | grep url | awk -F= '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')
+
+    echo $GITREPO
+}

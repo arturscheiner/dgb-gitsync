@@ -1,0 +1,17 @@
+#!/bin/bash
+
+watchView()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+    local PIPELINECONFIG=$(echo $PIPELINE-v$MAJ_VERSION)
+
+    if checkControlBindedPipeline $PIPELINECONFIG; then
+        Info "the pipeline is binded with a repo folder"
+    # else
+
+    #     bindControlPipelineWithGit $PIPELINECONFIG $GITREPO
+    #     Success "the pipeline $(TT blue; TT underline)$PIPELINE$(TT normal) with the major version $(TT blue; TT underline)$MAJ_VERSION$(TT normal) was binded"
+        watchControlPipelineChanges $PIPELINE $MAJ_VERSION
+    fi
+}

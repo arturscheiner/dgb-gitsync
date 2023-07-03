@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# add pipeline 
+
+
+addPipeGitRepo()
+{
+  PIPE_REPO=$1
+  cd $DGB_GS_PIPES
+  git clone $PIPE_REPO
+  cd - 
+}
+
+bindControlGitRepo()
+{
+    addGit 
+}
+
+bindControlPipelineWithGit()
+{
+  local PIPELINECONFIG=$1
+  local GITREPO=$2
+
+  cd $DGB_GS_PIPES
+  git clone $GITREPO $DGB_GS_PIPES/$PIPELINECONFIG
+  echo
+}

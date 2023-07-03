@@ -1,0 +1,10 @@
+#!/bin/bash
+
+listView()
+{
+    Title "List configured pipelines"
+    echo "The pipelines listed bellow are ready to be synched:"
+    echo 
+    listControlConfiguredPipelines
+    echo
+}

@@ -1,0 +1,175 @@
+#!/bin/bash
+
+setModelGitTagsForBranch()
+{
+  local PIPELINE=$1
+  local PIPELINEVERSION=$2
+  local TAGS=$3
+  local MAJ_VERSION=$(echo $PIPELINEVERSION | awk -F. '{print $1}')
+
+  cd $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION
+  
+  for t in $TAGS; do git tag $(echo $t | sed 's/\"//g'); done
+
+  git tag | awk '{print}'
+
+  cd -
+}
+
+getModelGitBranchNameFromFlowSpec()
+{
+  local FLOWSPEC=$1
+  local GITBRANCH=$(cat $FLOWSPEC | jq -c '.[] | map(select(.name | index("commit"))) | select(length >0)' | jq -r '.[] | .params.gitbranch')
+
+  echo $GITBRANCH
+}
+
+getModelGitMergeFromFlowSpec()
+{
+
+  local FLOWSPEC=$1
+  local GITMERGE=$(cat $FLOWSPEC | jq -c '.[] | map(select(.name | index("commit"))) | select(length >0)' | jq -r '.[] | .params.gitmerge')
+
+  if $GITMERGE; then echo "true"; fi
+}
+
+getModelGitTagsFromFlowSpec()
+{
+  local FLOWSPEC=$1
+  local GITTAGS=("$(cat $FLOWSPEC | jq -c '.[] | map(select(.name | index("commit"))) | select(length >0)' | jq -r '.[] | .params.gittags[]')")
+
+  echo $GITTAGS
+}
+
+getModelBranchQuantity()
+{
+  local QTDE_BRANCHS=$(git branch | wc -l | sed 's/ //g')
+}
+
+getModelMainBranchNameFromRepo()
+{
+  local PIPELINE=$1
+  local PIPELINEVERSION=$2
+  local MAJ_VERSION=$(echo $PIPELINEVERSION | awk -F. '{print $1}')
+
+  local BRANCHNAME=$(cd $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION; git branch | awk 'NR <= 1' | sed 's/ //g;s/*//g')
+
+  echo $BRANCHNAME
+}
+
+mergeModelBranch()
+{
+  local PIPELINE=$1
+  local PIPELINEVERSION=$2
+  local MAJ_VERSION=$(echo $PIPELINEVERSION | awk -F. '{print $1}')
+
+  cd $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION
+  git branch v$PIPELINEVERSION
+  cd -
+}
+
+createModelBranch()
+{
+  local PIPELINE=$1
+  local PIPELINEVERSION=$2
+  local MAJ_VERSION=$(echo $PIPELINEVERSION | awk -F. '{print $1}')
+
+  cd $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION
+  git branch v$PIPELINEVERSION
+  cd -
+}
+
+getModelGitBranch()
+{
+  #use getModelGitBranch pipeline branch
+
+  local PIPELINE=$1
+  local PIPELINEVERSION=$2
+  local MAJ_VERSION=$(echo $PIPELINEVERSION | awk -F. '{print $1}')
+
+  local GITBRANCHS=$(cd $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION; git branch | grep $PIPELINEVERSION; cd - | grep $PIPELINEVERSION)
+
+  echo $GITBRANCHS
+
+}
+
+getModelGitPipelineConfigUrl()
+{
+  local PIPELINECONFIG=$1
+  local GITCONFIG="$DGB_GS_PIPES/$PIPELINECONFIG/.git/config"
+
+  if [[ -f $GITCONFIG ]]; then
+     local GITURL=$(cat $GITCONFIG | grep url | awk -F= '{print $2}' | sed 's/ //g')
+     echo $GITURL
+  fi 
+}
+
+addPipeGitRepo()
+{
+  PIPE_REPO=$1
+  cd $DGB_GS_PIPES
+  git clone $PIPE_REPO
+  cd - 
+}
+
+CreateReadme()
+{
+  local PIPELINE=$1
+  local MAJ_VERSION=$2
+
+  local PIPE_REPO_README=$DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION/README.md
+  printf "## This is the pipeline $PIPELINE README:\n" > $PIPE_REPO_README
+  CreatePipelineTree $PIPELINE $MAJ_VERSION >> $PIPE_REPO_README
+}
+
+CreateCommitMessage()
+{
+  local FLOWSPEC=$1
+  local VERSION=$2
+  local CHECKSUM=$3
+  local MESSAGE=()
+
+  MESSAGE+=("$(cat $FLOWSPEC | jq -c '.[] | map(select(.name | index("commit"))) | select(length >0)' | jq '.[] | .params.commit_summary')")
+  MESSAGE+=("$(cat $FLOWSPEC | jq -c '.[] | map(select(.name | index("commit"))) | select(length >0)' | jq '.[] | .params.commit_description')")
+  
+  echo ${MESSAGE[@]}
+}
+
+CreatePipelineTree()
+{
+  local PIPELINE=$1
+  local MAJ_VERSION=$2
+  printf "## This is the pipeline components tree:\n"
+  printf "\`\`\`bash\n"
+  cat $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION/flowspec.json | jq '.start[] | (.stepName)' | jq -r 
+  printf "\`\`\`\n"
+}
+
+CheckSubTree()
+{
+ local PIPELINE=$1
+ local MAJ_VERSION=$2
+
+ TYPES="choice"
+
+ EXPAND_TYPE=$(cat $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION/flowspec.json | jq '.start[] | select(.type=="choice")')
+ 
+ printf "## This is the pipeline component choice:\n"
+  printf "\`\`\`bash\n"
+  cat $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION/flowspec.json | jq '.start[] | (.stepName)' | jq -r 
+  printf "\`\`\`\n"
+}
+
+CheckChoiceTypeConnector()
+{
+  PIPE_NAME=$1
+  TYPE="choice"
+}
+
+CheckBlockTypeConnectors()
+{
+  PIPE_NAME=$1
+  CONNECTOR_NAMES="for-each-connector"
+  PIPE_REPO_FLOWSPEC=$DGB_GS_DIR/$PIPE_NAME/flowspec.json
+  LIST=$(jq '.start[] | select(.type=="choice") | {when} | .when[] | {target}' $PIPE_REPO_FLOWSPEC)
+}

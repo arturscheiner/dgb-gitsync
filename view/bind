@@ -1,0 +1,20 @@
+#!/bin/bash
+
+bindView()
+{
+    local PIPELINECONFIG=$1
+    local GITREPO=$2
+
+    local PIPELINE=$(echo $PIPELINECONFIG | awk -F-v '{print $1}')
+    local MAJ_VERSION=$(echo $PIPELINECONFIG | awk -F-v '{print $2}')
+
+    if checkControlBindedPipeline $PIPELINECONFIG $GITREPO; then
+        Info "the pipeline already binded with a configuration"
+    else
+
+        bindControlPipelineWithGit $PIPELINECONFIG $GITREPO
+        Success "the pipeline $(TT blue; TT underline)$PIPELINE$(TT normal) with the major version $(TT blue; TT underline)$MAJ_VERSION$(TT normal) was binded"
+    fi
+
+    listView
+}

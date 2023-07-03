@@ -1,0 +1,16 @@
+#!/bin/bash
+
+removeView()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    if checkControlAddedPipeline $PIPELINE $MAJ_VERSION; then
+            removeControlPipeline $PIPELINE $MAJ_VERSION
+            Success "the pipeline $(TT blue; TT underline)$PIPELINE$(TT normal) with the major version $(TT blue; TT underline)$MAJ_VERSION$(TT normal) was removed from the configured list"
+    else
+            Info "the pipeline $(TT blue; TT underline)$PIPELINE$(TT normal) with the major version $(TT blue; TT underline)$MAJ_VERSION$(TT normal) is not configured"
+    fi
+
+    listView
+}

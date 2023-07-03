@@ -1,0 +1,41 @@
+#!/bin/bash
+
+watchControlPipelineChanges()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    local PIPE_LINE="$(getModelPipelineIDandVersion $PIPELINE $MAJ_VERSION)"
+    local PIPE_ID=$(echo $PIPE_LINE | awk '{print $1}')
+    local PIPE_VERSION="$(echo $PIPE_LINE | awk '{print $2}')"
+
+    echo "Watch Sync - $PIPELINE"
+    echo "Pipeline ID - $PIPE_ID"
+    echo "Pipeline Version = $PIPE_VERSION"
+    echo "Pipeline Major Version = $MAJ_VERSION"
+    local HASH_A=$(createModelPipelineFlowspecHash $PIPE_ID)
+
+    syncControlPipelineWithGit $PIPELINE $MAJ_VERSION
+    
+    while true
+    do
+      local PIPE_LINE="$(getModelPipelineIDandVersion $PIPELINE $MAJ_VERSION)"
+      local PIPE_ID=$(echo $PIPE_LINE | awk '{print $1}')
+      local PIPE_VERSION="$(echo $PIPE_LINE | awk '{print $2}')"
+      local HASH_B=$(createModelPipelineFlowspecHash $PIPE_ID)
+      
+      if [ $HASH_A != $HASH_B ]
+      then
+        Info "***** - Watching changes on $PIPELINE with id $PIPE_ID"
+        Info "***** - Watch Sync - $PIPELINE"
+        Info "***** - Pipeline ID - $PIPE_ID"
+        Info "***** - Pipeline Version = $PIPE_VERSION"
+        Info "***** - Pipeline Major Version = $MAJ_VERSION"
+        
+        #syncControlPipelineWithGit $PIPELINE $MAJ_VERSION
+        syncView $PIPELINE $MAJ_VERSION
+        HASH_A=$HASH_B
+      fi
+      sleep 5
+    done
+}

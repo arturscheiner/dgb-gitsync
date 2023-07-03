@@ -1,0 +1,80 @@
+#!/bin/bash
+
+optionView-a()
+{
+     if [[ ! -z $PIPELINE ]]; then
+        if [[ ! $MAJ_VERSION =~ ^-?[1-9]$ ]]; then       
+            Error "-v option is required and should be an integer > 0"
+            callForHelp
+            exit
+        else
+            addView $PIPELINE $MAJ_VERSION
+        fi
+    fi
+}
+
+optionView-b()
+{
+    if [[ ! -z "$PIPELINECONFIG" ]]; then
+        if [[ -z "$GITREPO" ]]; then       
+            Error "-b option requires a git repo to be binded with"
+            callForHelp
+            exit
+        else
+            bindView $PIPELINECONFIG $GITREPO
+        fi
+    fi
+}
+
+optionView-l()
+{
+    listView
+}
+
+optionView-r()
+{
+     if [[ ! -z $PIPELINE ]]; then
+        if [[ ! $MAJ_VERSION =~ ^-?[1-9]$ ]]; then       
+            Error "-v option is required and should be an integer > 0"
+            callForHelp
+            exit
+        else
+            removeView $PIPELINE $MAJ_VERSION
+        fi
+    fi
+}
+
+optionView-s()
+{
+    if [[ ! -z $PIPELINE ]]; then
+        if [[ ! $MAJ_VERSION =~ ^-?[1-9]$ ]]; then       
+            Error "-v option is required and should be an integer > 0"
+            callForHelp
+            exit
+        else
+            syncView $PIPELINE $MAJ_VERSION
+        fi
+    fi
+}
+
+optionView-w()
+{
+    if [[ ! -z $PIPELINE ]]; then
+        if [[ ! $MAJ_VERSION =~ ^-?[1-9]$ ]]; then       
+            Error "-v option is required and should be an integer > 0"
+            callForHelp
+            exit
+        else
+            watchView $PIPELINE $MAJ_VERSION
+        fi
+    fi
+}
+
+noOptionView()
+{
+        if [[ -z $1 ]]; then
+        Error "no option defined"
+        callForHelp
+        exit
+    fi
+}

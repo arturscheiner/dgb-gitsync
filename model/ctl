@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# checkModelPipeline()
+# {
+#     local PIPELINE=$1
+#     local MAJ_VERSION=$2
+
+#     PIPELINEID=$(digibeectl get pipeline --name $PIPELINE | awk -v pipe="$PIPELINE" -v maj_ver="$MAJ_VERSION" '{if (($1 == pipe) && ($3 >= maj_ver)) { print $2 }}')
+    
+#     if [[ -z $PIPELINEID ]];then
+#         false
+#     else
+#         true
+#     fi  
+# }
+
+getModelPipelineID()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    local PIPELINEID=$(digibeectl get pipeline --name $PIPELINE | awk -v pipe="$PIPELINE" -v maj_ver="$MAJ_VERSION" '{if (($1 == pipe) && ($3 ~ maj_ver)) { print $2 }}')
+    
+    echo $PIPELINEID
+}
+
+getModelPipelineIDandVersion()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    local PIPELINEIDANDVERSION=$(digibeectl get pipeline --name $PIPELINE | awk -v pipe="$PIPELINE" -v maj_ver="$MAJ_VERSION" '{if (($1 == pipe) && ($3 ~ maj_ver)) { print $2,$3 }}')
+    
+    echo $PIPELINEIDANDVERSION
+}
+
+getModelRealm()
+{
+    local REALM="$(cat $DIGIBEECTL_CFG | grep "realm" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
+
+    echo $REALM
+}
+
+getModelAccount()
+{
+    local ACCOUNT="$(cat $DIGIBEECTL_CFG | grep "email" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
+
+    echo $ACCOUNT
+}
+
+getDigibeeCtl(){
+    local digibeectl=$(which digibeectl)
+
+    if [ -f "$digibeectl" ]; then
+        true
+    else
+        false
+    fi
+}
+
+getDigibeeCtlConfig()
+{
+    local digibeectl_cfg="$HOME/.digibeectl/config.json"
+
+    if [ -f "$digibeectl_cfg" ]; then
+        true
+    else
+        false
+    fi
+}
+
+createModelPipelineFlowspecHash()
+{
+    local PIPELINEID=$1
+
+    local PIPELINEHASH=$(digibeectl get pipeline --pipeline-id $PIPELINEID --flowspec | shasum - | awk '{print $1}')
+    
+    echo $PIPELINEHASH  
+}

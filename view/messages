@@ -1,0 +1,42 @@
+#!/bin/bash
+
+showViewHeader(){
+    printf "$(TT magenta)Digibee$(TT white) Git Sync $HVERSION\n\n"
+}
+
+showViewRealmAccount(){
+    printf "realm: $REALM\n"
+    printf "account: $ACCOUNT\n\n"
+}
+
+initViewError(){
+    Error "Digibeectl is not installed or it is installed but is not configured."
+}
+
+callForHelp(){ 
+    printf "Check the help by running:\n\n\t$(TT green; TT bold)$THIS_TYPE -h$(TT normal)\n\n"
+}
+
+Error()
+{
+    MESSAGE=$1
+    printf "$(TT red; TT bold)ERROR: $(TT white; TT normal)$MESSAGE\n\n"
+}
+
+Warning()
+{
+    MESSAGE=$1
+    printf "$(TT yellow; TT bold)WARNING: $(TT white; TT normal)$MESSAGE\n\n"
+}
+
+Success()
+{
+    MESSAGE=$1
+    printf "$(TT green; TT bold)SUCCESS: $(TT white; TT normal)$MESSAGE\n\n"
+}
+
+Info()
+{
+    MESSAGE=$1
+    printf "$(TT orange; TT bold)INFO: $(TT white; TT normal)$MESSAGE\n\n"
+}

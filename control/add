@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# add pipeline 
+
+addControlGitRepo()
+{
+    addGit 
+}
+
+addControlPipeline()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    createModelPipelineFolder $PIPELINE $MAJ_VERSION
+}

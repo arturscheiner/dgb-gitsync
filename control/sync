@@ -1,0 +1,98 @@
+#!/bin/bash
+
+##
+## Git Sync Main Function
+##
+syncControlPipelineWithGit()
+{
+#Define received arguments
+local PIPELINE=$1
+local MAJ_VERSION=$2
+
+
+PIPE_NAME=$PIPELINE
+PIPE_PATH="$DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION"
+PIPE_JSON="$PIPE_PATH/flowspec.json"
+PIPE_LINE="$(getModelPipelineIDandVersion $PIPELINE $MAJ_VERSION)"
+
+
+PIPE_ID=$(echo $PIPE_LINE | awk '{print $1}')
+PIPE_VERSION="$(echo $PIPE_LINE | awk '{print $2}')"
+PIPE_CHECKSUM=$(cat $PIPE_PATH/version.json | jq -r '.checksum')
+
+VERSIONS_PATH="$PIPE_PATH/versions/$PIPE_VERSION"
+DOCS_PATH="$PIPE_PATH/docs/$PIPE_VERSION"
+
+mkdir -p $VERSIONS_PATH $DOCS_PATH
+
+digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | jq > $PIPE_JSON
+digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | jq > $PIPE_PATH/versions/$PIPE_VERSION/flowspec.json
+
+declare -a MESSAGE="($(CreateCommitMessage $PIPE_JSON $PIPE_VERSION $PIPE_CHECKSUM))"
+
+if [[ ! -z $MESSAGE ]]; then
+  local SUMMARY=${MESSAGE[0]}
+  local DESCRIPTION=${MESSAGE[1]}
+else
+  local SUMMARY="Version $PIPE_VERSION.$PIPE_CHECKSUM"
+  local DESCRIPTION="Commit Message Capsule not configured for this Pipeline. The default summary and description are being used."
+fi
+
+echo "Sync - $PIPE_NAME"
+echo "Pipeline ID - $PIPE_ID"
+echo "Pipeline Version - $PIPE_VERSION"
+echo "File output - $PIPE_JSON"
+echo "Previous Checksum - $PIPE_CHECKSUM"
+echo "Commit Summary - $SUMMARY"
+echo "Commit Description - $DESCRIPTION"
+
+#New Checksumm
+PIPE_CHECKSUM=$(shasum $PIPE_JSON | awk '{print $1}' | awk '{print substr($0,0,5)}')
+
+cat <<EOT > $PIPE_PATH/version.json
+{
+  "name" : "$PIPE_NAME",
+  "id" : "$PIPE_ID",
+  "version" : "$PIPE_VERSION",
+  "checksum" : "$PIPE_CHECKSUM",
+  "summary" : "$SUMMARY",
+  "description" : "$DESCRIPTION"
+}
+EOT
+
+CreateReadme $PIPELINE $MAJ_VERSION
+
+cd $PIPE_PATH
+
+if ! checkControlGitBranch $PIPELINE $PIPE_VERSION; then
+  createModelBranch $PIPELINE $PIPE_VERSION
+fi
+
+git checkout v$PIPE_VERSION
+git add *
+
+if checkControlGitTagFromFlowSpec $PIPE_JSON; then
+  local TAGS=$(getModelGitTagsFromFlowSpec $PIPE_JSON)
+  Info "there are tags: $TAGS"
+  for t in $TAGS; do git tag -d $(echo $t | sed 's/\"//g'); git fetch --prune --tags; git tag $(echo $t | sed 's/\"//g'); done
+  #setModelGitTagsForBranch $PIPELINE $PIPE_VERSION $TAGS
+fi
+
+git commit -F- <<EOF
+$SUMMARY
+$(printf "$DESCRIPTION")
+Version $PIPE_VERSION.$PIPE_CHECKSUM
+EOF
+git push --tags --set-upstream origin v$PIPE_VERSION
+
+if checkControlGitMergeFromFlowSpec $PIPE_JSON; then
+  Info "to merge" 
+  git switch $(getModelMainBranchNameFromRepo $PIPELINE $PIPE_VERSION)
+  git merge v$PIPE_VERSION
+  git add *
+  git push
+else
+  Info "no merge"
+fi
+
+}

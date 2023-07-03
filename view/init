@@ -1,0 +1,72 @@
+#!/bin/bash
+
+initViewMain(){
+    showViewRealmAccount
+    ############################################################
+    # Process the input options.                               #
+    ############################################################
+    # Get the options
+    OPTERR=0
+    OPTION=$1
+
+    isLocal && OPTIONS="hlca:b:s:r:d:v:w:" || OPTIONS="hlca:s:r:w:"
+
+    while getopts $OPTIONS option; do
+    case $option in
+        a) # config
+            local PIPELINE=$OPTARG
+            local MAINOPT=$option            
+            ;;
+        b) #bind
+            #bindPipeGitRepo $OPTARG
+            PIPELINECONFIG=$OPTARG
+            GITREPO=$3
+            local MAINOPT=$option
+            #echo "*** - $OPTARG $3"
+            ;;
+        h) # display Help
+            Help
+            exit;;
+        s) # set active pipeline
+            #gitSync $OPTARG
+            ##echo ${OPTARG[@]}
+            local PIPELINE=$OPTARG
+            local MAINOPT=$option
+            ;;
+        d) # deploy script to the /usr/local/bin
+            #Check
+            Deploy $OPTARG
+            exit;;
+        l) # list script
+            local MAINOPT=$option
+            ;;
+        r) # list script
+            local PIPELINE=$OPTARG
+            local MAINOPT=$option  
+            ;;
+        u) # unset active pipeline
+            Unset
+            echo
+            exit;;
+        v) # set the version
+            local MAJ_VERSION=$OPTARG
+            ;;
+        w) # unset active pipeline
+            local PIPELINE=$OPTARG
+            local MAINOPT=$option
+            ;;
+        c) # unset active pipeline
+            Check
+            exit;;
+        \?) # Invalid option
+            Error "invalid option $OPTION or option without required config"
+            callForHelp
+            exit;;
+    esac
+    done
+
+    noOptionView $1
+
+    $(echo optionView-$MAINOPT $PIPELINE $MAJ_VERSION)
+
+}

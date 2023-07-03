@@ -1,0 +1,203 @@
+#!/bin/bash
+
+checkControlGitMergeFromFlowSpec()
+{
+  local FLOWSPEC=$1
+
+  local GITMERGE=$(getModelGitMergeFromFlowSpec $FLOWSPEC)
+
+  if [[ -z $GITMERGE ]]; then
+    false
+  else
+    true
+  fi
+}
+
+checkControlGitTagFromFlowSpec()
+{
+  local FLOWSPEC=$1
+
+  local GITTAG=$(getModelGitTagsFromFlowSpec $FLOWSPEC)
+
+  if [[ -z $GITTAG ]]; then
+    false
+  else
+    true
+  fi
+}
+
+checkControlGitBranch()
+{
+  local PIPELINE=$1
+  local VERSION=$2
+
+  local GITBRANCH=$(getModelGitBranch $PIPELINE $VERSION)
+
+  if [[ -z $GITBRANCH ]]; then
+    false
+  else
+    true
+  fi
+
+}
+
+checkControlBindedPipeline()
+{
+  local PIPELINECONFIG=$1
+  local GITREPO=$2
+
+  local GITURL=$(getModelGitPipelineConfigUrl $PIPELINECONFIG)
+
+  if [[ -z $GITURL ]];then
+      false
+  else
+      true
+  fi
+}
+
+checkControlAddedPipeline()
+{
+  local PIPELINE=$1
+  local MAJ_VERSION=$2
+
+  local PIPELINEFOLDER=$(getModelPipelineFolder $PIPELINE $MAJ_VERSION)
+
+  if [[ -z $PIPELINEFOLDER ]];then
+      false
+  else
+      true
+  fi
+
+}
+
+checkControlPipeline()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    local PIPELINEID=$(getModelPipelineID $PIPELINE $MAJ_VERSION)
+
+    if [[ -z $PIPELINEID ]];then
+        false
+    else
+        true
+    fi
+}
+
+CheckRequirements()
+{
+  if $(getDigibeeCtl) && $(getDigibeeCtlConfig); then
+    true
+  else 
+    false
+  fi
+}
+
+Check()
+{
+    Title "Check this script deployment and its dependencies"
+    Title "about dependencies" white
+    CheckDigibeeCtl
+    CheckGit
+    printf "\n"
+    Title "about this script" white
+    CheckThisScript
+    printf "\n"
+}
+
+CheckThisScript()
+{
+  TRY_FIND=$(which $THIS)
+
+    if [ -z $TRY_FIND ]
+    then
+        printf "$(TT red; TT bold)\xE2\x9C\x97$(TT white; TT normal) This script is not deployed on a PATH.\n" 
+        printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) These are the available PATHS configured for this profile:\n"
+        
+
+        
+        for p in $(echo $USER_PATHS); 
+        do
+            [ $p = "/usr/local/bin" ] && printf "  $(TT blue; TT bold)$p$(TT white; TT normal)\n" || printf "  $p\n"
+        done
+        
+        printf "\n"
+        printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) Deploy it using the recommended command from the current directory:\n\n"
+        printf "  $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"
+    else
+        # printf "Seems that this script is already deployed on this system!\n"
+        # printf "Check it out where it is deployed:\n\n"
+        # printf "  $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n\n"
+        CheckThisScriptVersion
+    fi 
+}
+
+CheckThisScriptVersion()
+{
+  TRY_FIND=$(which $THIS)
+  REPO_PATH="https://github.com/arturscheiner/dgb-gitsync.git"
+  ONLINE_PATH="https://raw.githubusercontent.com/arturscheiner/dgb-gitsync/main/dgb-gs"
+  DEPLOYED=$(shasum $(which $THIS) | awk '{print $1}')
+  ACTUAL=$(shasum $(echo $0) | awk '{print $1}')
+  ONLINE=$(shasum <(curl -s $ONLINE_PATH) | awk '{print $1}')
+
+  if [ $DEPLOYED = $ACTUAL ]
+  then
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script is already deployed on your system: $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n"
+  else
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script is different than the version deployed: $(TT green; TT bold)sudo $0 -d /usr/local/bin$(TT white; TT normal)\n"    
+  fi
+
+  if [[ $0 == ./* ]]; then    
+    if [ $ACTUAL = $ONLINE ]
+    then
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script on this folder is the same available on its repo: $(TT blue; TT bold)$REPO_PATH$(TT white; TT normal)\n"
+    else
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script on this folder is different than the one available on its repo: $(TT green; TT bold)git pull$(TT white; TT normal)\n"    
+    fi
+  fi
+
+
+  if [ $DEPLOYED = $ONLINE ]
+  then
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) The script deployed is the same available on its repo: $(TT blue; TT bold)$REPO_PATH$(TT white; TT normal)\n"
+  else
+    printf "$(TT yellow; TT bold)\xE2\x8F\xB6$(TT white; TT normal) The script deployed is different than the one available on its repo: $(TT green; TT bold)$REPO_PATH$(TT white; TT normal)\n"    
+  fi
+}
+
+CheckDigibeeCtl()
+{
+  TRY_DIGIBEECTL=$(which digibeectl)
+
+  if [ -z $TRY_DIGIBEECTL ]
+  then
+    printf "$(TT yellow; TT bold)\u23f6$(TT white; TT normal) Git is not installed on your system: https://docs.digibee.com/documentation/platform/digibeectl\n"
+  else
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) Digibeectl is installed on your system: $(TT blue; TT bold)$TRY_DIGIBEECTL$(TT white; TT normal)\n"
+    CheckDigibeeCtlConfig
+  fi
+}
+
+CheckDigibeeCtlConfig()
+{
+  DGBCTLCONFIG=~/.digibeectl/config.json
+  if [ -f $DGBCTLCONFIG ]
+  then 
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) Digibeectl is configured on your system: $(TT blue; TT bold)$DGBCTLCONFIG$(TT white; TT normal)\n"
+  else
+    printf "$(TT red; TT bold)\xE2\x9C\x97$(TT white; TT normal) Digibeectl is not configured on your system.\n"
+  fi
+}
+
+CheckGit()
+{
+  TRY_GIT=$(which git)
+
+  if [ -z $TRY_GIT ]
+  then
+    printf "$(TT yellow; TT bold)\u23f6$(TT white; TT normal) Git is not installed on your system.\n"
+  else
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) Git is installed on your system: $(TT blue; TT bold)$TRY_GIT$(TT white; TT normal)\n"
+  fi
+}

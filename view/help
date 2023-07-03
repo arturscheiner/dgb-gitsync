@@ -1,0 +1,23 @@
+#!/bin/bash
+
+Help()
+{
+    Title "Help Information"
+    printf "Syntax: $(TT bold)$THIS_TYPE [-a|l|r|s|c|d|h] params$(TT normal)\n\n"
+    printf "$(TT yellow)about pipeline stuff$(TT white)\n"
+    printf "a\tAdd a new pipeline to the available list\n\tE.g. -> $(TT green)$THIS_TYPE -a pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
+    printf "b\tBind a pipeline from the available list with a git repo\n\tE.g. -> $(TT green)$THIS_TYPE -b pipeline-config-name $(TT underline)git@bitbucket.org:arturscheiner/pipeline-repo-name.git$(TT normal; TT white)\n\n"
+    printf "l\tList all the pipelines available and binded\n\tE.g. -> $(TT green)$THIS_TYPE -l$(TT white)\n\n"
+    printf "r\tRemove a pipeline from the configured git sync list\n\tE.g. -> $(TT green)$THIS_TYPE -b pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
+    printf "s\tSync a pipeline with its git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
+    printf "w\tWatch and sync when a pipeline changes\n\tE.g. -> $(TT green)$THIS_TYPE -w pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
+   
+   printf "$(TT yellow)about this script$(TT white)\n"
+   printf "c\tCheck this script deployment\n\tE.g. -> $(TT green)$THIS_TYPE -c$(TT white)\n\n"
+    if [[ $0 == ./* ]]; then    
+        printf "d\tDeploy this script into a directory\n\tE.g. -> $(TT green)sudo $THIS_TYPE -d /usr/local/bin$(TT white)\n\n"
+    fi
+
+    printf "$(TT yellow)about anything else$(TT white)\n"  
+    printf "h\tShow this help information\n\tE.g. -> $(TT green)$THIS_TYPE -h$(TT white)\n\n"
+}

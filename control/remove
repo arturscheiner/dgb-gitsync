@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#remove the pipeline from the configured list
+
+removeControlPipeline()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    deleteModelPipelineFolder $PIPELINE $MAJ_VERSION
+}

@@ -1,0 +1,63 @@
+#!/bin/bash
+
+Title()
+{
+    MESSAGE=$1
+    [ -z $2 ] && COLOR="green" || COLOR=$2
+    printf "$(TT $COLOR; TT bold)$MESSAGE$(TT normal; TT white)\n\n"
+}
+
+TT()
+{
+    FORMAT=$1
+
+    case $FORMAT in
+        bold)
+            tput bold
+            ;;
+        underline)
+            tput smul
+            ;;
+        standout)
+            tput smso
+            ;;
+        normal)
+            tput sgr0
+            ;;
+        red)
+            tput setaf 1
+            ;;
+        green)
+            tput setaf 2
+            ;;
+        yellow)
+            tput setaf 3
+            ;;
+        blue)
+            tput setaf 4
+            ;;
+        magenta)
+            tput setaf 5
+            ;;
+        cyan)
+            tput setaf 6
+            ;;
+        white)
+            tput setaf 7
+            ;;
+        orange)
+            tput setaf 215
+            ;;
+        *)
+            tput sgr0
+            ;;
+    esac
+}
+
+spin() {
+   local -a marks=( '/' '-' '\' '|' )
+   while [[ 1 ]]; do
+     printf '%s\r' "${marks[i++ % ${#marks[@]}]}"
+     sleep 1
+   done
+ }
