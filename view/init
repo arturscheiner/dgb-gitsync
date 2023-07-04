@@ -9,7 +9,7 @@ initViewMain(){
     OPTERR=0
     OPTION=$1
 
-    isLocal && OPTIONS="hlca:b:s:r:i:v:w:" || OPTIONS="hlca:s:r:w:"
+    isLocal && OPTIONS="hlca:b:s:r:i:v:w:" || OPTIONS="hlca:b:s:r:v:w:"
 
     while getopts $OPTIONS option; do
     case $option in
