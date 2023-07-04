@@ -1,0 +1,305 @@
+#!/bin/bash
+
+#PIPE_NAME="simple-viacep-weather-integration"
+# PIPE_NAME=$1
+# FLOWSPEC=~/.dgb-gs/realms/demo/pipelines/$PIPE_NAME-v1/flowspec.json
+# LIST=$(jq -r '.start[] | .stepName' $FLOWSPEC)
+# KUST+=($(jq -r 'keys_unsorted[]' $FLOWSPEC))
+# CLIST=($LIST)
+# RLIST=($KUST)
+
+subTreeNames=("block-execution-connector" "for-each-connector" "stream-db-connector-v3")
+subTreeChoice=("choice")
+subTreeParallel=("parallel-execution-connector")
+#jq -r '.start[] | [.stepName,.type,.name] | @csv' $FLOWSPEC > ~/.dgb-gs/cache/main_components.csv
+
+#IFS=$'\r\n' read -d '' -r -a CLIST < $(jq '.start[] | .stepName' $FLOWSPEC)
+# readarray -t CLIST <<< $(jq '.start[] | .stepName' $FLOWSPEC)
+#echo ${CLIST[@]}
+
+#jq -r '.start[] | .stepName' $FLOWSPEC
+
+
+#  for c in ${CLIST[@]}
+#  do
+#       echo $c
+#  done
+
+
+
+
+
+# checkOnProcess()
+# {
+#     #echo $@
+#     STEPNAME=$@
+#     ONPROCESS=$(jq --arg stepname "$STEPNAME" '.start[] | select(.stepName==$stepname) | .params.onProcess' $FLOWSPEC)
+
+#     if [ $ONPROCESS != null ] 
+#     then
+#         echo $ONPROCESS
+#     fi
+# }
+
+# checkOnException()
+# {
+#     #echo $@
+#     STEPNAME=$@
+#     ONEXCEPTION=$(jq --arg stepname "$STEPNAME" '.start[] | select(.stepName==$stepname) | .params.onException' $FLOWSPEC)
+
+#     if [ $ONEXCEPTION != null ] 
+#     then
+#         getSubFlow $ONEXCEPTION
+#     fi
+# }
+
+
+
+#while read -r line; 
+#do 
+#    lines+=("$line"); 
+#    echo $line;
+#    checkName
+#    checkOnProcess $line
+#    checkOnException $line
+#done <<<"$LIST"
+
+#tipos de conectores que tem sub navigation
+#Number of Root Objects
+# NTO=$(cat $FLOWSPEC | jq '. | length')
+
+# #Number of Start[] Objects
+# NSO=$(cat $FLOWSPEC | jq '.start | length')
+# l=0
+
+# getStartFlow()
+# {
+#     local is=0
+#     local ie=$((NSO-1))
+#     local i
+
+#     for ((i=is;i<=ie;i++)); do
+#         local STEPNAME=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .stepName' | jq -r)
+#         local NAME=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .name' | jq -r)
+#         local TYPE=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .type' | jq -r)
+#         echo - $STEPNAME
+        
+#         if checkName $NAME; then
+#             local ONPROCESS=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.onProcess' | jq -r)
+#             getSubFlow $ONPROCESS
+#             local ONEXCEPTION=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.onException' | jq -r)
+#             getSubFlow $ONEXCEPTION
+#         fi
+
+#         if checkType $TYPE; then
+#                 echo "  - é subtype"
+#         fi
+        
+#         if checkParallel $NAME; then           
+#                 local LENG=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.parallelExecutions' | jq -r | jq '. | length' )
+#                 local EXECUTIONS=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.parallelExecutions' | jq -r)
+#                 echo "  - é subtypeparallel $LEN"
+#                 processParallel $LENG $EXECUTIONS
+#         fi    
+#     done
+# }
+
+getFlow()
+{   
+    local ROOT=$1
+    local LEVEL=$3
+    local is=0
+    local NSO=$(cat $FLOWSPEC | jq --arg root "$ROOT" '.[$root] | length')
+    local ie=$((NSO-1))      
+    local i
+    local n
+    for ((i=is;i<=ie;i++)); do
+        n=$i$2
+        local STEPNAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .stepName' | jq -r)
+        local NAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .name' | jq -r)
+        local TYPE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .type' | jq -r)
+        local l=${#n}
+        #echo $n $STEPNAME
+        local COMPLEMENT
+        [[ $NAME == null ]] && COMPLEMENT=$TYPE || COMPLEMENT=$NAME
+        #echo $LEVEL
+        case $LEVEL in
+            choice)
+                formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+2))
+                ;;
+            sub)
+                formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+1))
+                ;;
+            *)
+                formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l
+                ;;
+        esac
+
+        #[[ -z $LEVEL ]] && formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l || formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+1))
+        #formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l
+
+        if checkName $NAME; then
+            formatInfo "onprocess" "onProcess" $l          
+            local ONPROCESS=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.onProcess' | jq -r)
+            getFlow $ONPROCESS $n sub
+            formatInfo "onexception" "onException" $l
+            local ONEXCEPTION=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.onException' | jq -r)
+            getFlow $ONEXCEPTION $n sub       
+        fi
+
+        if checkChoice $TYPE; then
+                #echo "  - é subtype"
+                local WHEN_LEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .when | length')
+                local WHEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .when' | jq -c)
+                local OTHERWISE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .otherwise' | jq -r) 
+                processChoice $WHEN_LEN "$WHEN" $n
+                formatInfo "otherwise" "$OTHERWISE" $l
+                getFlow "$OTHERWISE" $n choice                    
+        fi
+        
+        if checkParallel $NAME; then           
+                local PARA_LEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.parallelExecutions' | jq -r | jq '. | length' )
+                local EXECS=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.parallelExecutions' | jq -r)
+                #echo $EXECS
+                #echo "  - é subtypeparallel $LEN"
+                #formatInfo "execution" "parallel" $l
+                processParallel $PARA_LEN $EXECS $n
+        fi    
+    done
+
+}
+
+formatInfoC()
+{
+    local TYPE=$1
+    local INFO=$2
+    local POSITION=$3
+    
+
+    case $TYPE in
+        onprocess)
+            printf "$(TT bold; TT green)"; for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──>$(TT normal) onProcess\n"
+            ;;
+        onexception)
+            printf "$(TT bold; TT red)"; for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──>$(TT normal) onException\n"
+            ;;
+        execution)
+             printf "$(TT bold; TT cyan)"; for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──\xce\x9e$(TT normal) parallel $INFO\n"
+            ;;
+        condition)
+            for (( c=1; c<=POSITION; c++)) ; do printf "\xe2\x80\x94" ; done; printf "xxxxx\xe2\x80\x94| $INFO\n"
+            ;;
+        when)
+            POSITION=$((POSITION+1))
+             printf "$(TT bold; TT orange)"; for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──)$(TT normal) when: $INFO\n"
+            ;;
+        otherwise)
+            POSITION=$((POSITION+1))
+            printf "$(TT bold; TT orange)"; for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──*$(TT normal) otherwise: $INFO\n"
+            ;;
+        *)
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf " ├── $INFO\n"
+            ;;
+    esac
+}
+
+formatInfo()
+{
+    local TYPE=$1
+    local INFO=$2
+    local POSITION=$3
+    
+
+    case $TYPE in
+        onprocess)
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──> onProcess\n"
+            ;;
+        onexception)
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──> onException\n"
+            ;;
+        execution)
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──\xce\x9e parallel $INFO\n"
+            ;;
+        condition)
+            for (( c=1; c<=POSITION; c++)) ; do printf "\xe2\x80\x94" ; done; printf "xxxxx\xe2\x80\x94| $INFO\n"
+            ;;
+        when)
+            POSITION=$((POSITION+1))
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──) when: $INFO\n"
+            ;;
+        otherwise)
+            POSITION=$((POSITION+1))
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf "     │└──* otherwise: $INFO\n"
+            ;;
+        *)
+            for (( c=1; c<=POSITION; c++)) ; do printf "  " ; done; printf " ├── $INFO\n"
+            ;;
+    esac
+}
+
+checkName()
+{
+    if [[ " ${subTreeNames[*]} " =~ " ${1} " ]]; then
+        true
+    else
+        false
+    fi
+}
+
+checkChoice()
+{
+    if [[ " ${subTreeChoice[*]} " =~ " ${1} " ]]; then
+        true
+    else
+        false
+    fi
+}
+
+checkParallel()
+{
+    if [[ " ${subTreeParallel[*]} " =~ " ${1} " ]]; then
+        true
+    else
+        false
+    fi
+}
+
+processParallel()
+{
+    local LEN=$1
+    local PEXECUTIONS=$2
+    local n=$3
+    local i
+    for ((i=0;i<=LEN;i++)); do
+      if [ $i != $LEN ]; then
+        local DESCRIPTION=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .description' | jq -r)
+        local EXECUTIONID=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .executionId' | jq -r)
+        local TARGET=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .target' | jq -r)
+        #NAME=$(cat $FLOWSPEC | jq --arg sf "$SUBFLOW" --argjson idx $i '.[$sf][$idx] | .name' | jq -r)
+        formatInfo "execution" "$EXECUTIONID" $l
+        getFlow $TARGET $n sub
+      fi 
+    done
+}
+
+processChoice()
+{
+    local WHEN_LEN=$1
+    local WHEN=$2
+    local n=$3
+    local i
+    for ((i=0;i<=WHEN_LEN;i++)); do
+      if [ $i != $WHEN_LEN ]; then
+        local TARGET=$(echo $WHEN | jq --argjson idx $i '.[$idx] | .target' | jq -r)
+        formatInfo "when" "$TARGET" $l
+        getFlow "$TARGET" $n choice
+      fi 
+    done
+}
+
+#getStartFlow
+#getFlow "start"
+
+#for r in (${KUST[@]}); do
+#    echo "*" $r
+#done

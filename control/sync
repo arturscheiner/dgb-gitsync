@@ -60,7 +60,7 @@ cat <<EOT > $PIPE_PATH/version.json
 }
 EOT
 
-CreateReadme $PIPELINE $MAJ_VERSION
+CreateReadme $PIPELINE $MAJ_VERSION $PIPE_JSON
 
 cd $PIPE_PATH
 
