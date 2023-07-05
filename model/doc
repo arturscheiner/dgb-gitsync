@@ -1,108 +1,8 @@
 #!/bin/bash
 
-#PIPE_NAME="simple-viacep-weather-integration"
-# PIPE_NAME=$1
-# FLOWSPEC=~/.dgb-gs/realms/demo/pipelines/$PIPE_NAME-v1/flowspec.json
-# LIST=$(jq -r '.start[] | .stepName' $FLOWSPEC)
-# KUST+=($(jq -r 'keys_unsorted[]' $FLOWSPEC))
-# CLIST=($LIST)
-# RLIST=($KUST)
-
-subTreeNames=("block-execution-connector" "for-each-connector" "stream-db-connector-v3")
+subTreeBlock=("block-execution-connector" "for-each-connector" "retry-connector" "do-while-connector")
 subTreeChoice=("choice")
 subTreeParallel=("parallel-execution-connector")
-#jq -r '.start[] | [.stepName,.type,.name] | @csv' $FLOWSPEC > ~/.dgb-gs/cache/main_components.csv
-
-#IFS=$'\r\n' read -d '' -r -a CLIST < $(jq '.start[] | .stepName' $FLOWSPEC)
-# readarray -t CLIST <<< $(jq '.start[] | .stepName' $FLOWSPEC)
-#echo ${CLIST[@]}
-
-#jq -r '.start[] | .stepName' $FLOWSPEC
-
-
-#  for c in ${CLIST[@]}
-#  do
-#       echo $c
-#  done
-
-
-
-
-
-# checkOnProcess()
-# {
-#     #echo $@
-#     STEPNAME=$@
-#     ONPROCESS=$(jq --arg stepname "$STEPNAME" '.start[] | select(.stepName==$stepname) | .params.onProcess' $FLOWSPEC)
-
-#     if [ $ONPROCESS != null ] 
-#     then
-#         echo $ONPROCESS
-#     fi
-# }
-
-# checkOnException()
-# {
-#     #echo $@
-#     STEPNAME=$@
-#     ONEXCEPTION=$(jq --arg stepname "$STEPNAME" '.start[] | select(.stepName==$stepname) | .params.onException' $FLOWSPEC)
-
-#     if [ $ONEXCEPTION != null ] 
-#     then
-#         getSubFlow $ONEXCEPTION
-#     fi
-# }
-
-
-
-#while read -r line; 
-#do 
-#    lines+=("$line"); 
-#    echo $line;
-#    checkName
-#    checkOnProcess $line
-#    checkOnException $line
-#done <<<"$LIST"
-
-#tipos de conectores que tem sub navigation
-#Number of Root Objects
-# NTO=$(cat $FLOWSPEC | jq '. | length')
-
-# #Number of Start[] Objects
-# NSO=$(cat $FLOWSPEC | jq '.start | length')
-# l=0
-
-# getStartFlow()
-# {
-#     local is=0
-#     local ie=$((NSO-1))
-#     local i
-
-#     for ((i=is;i<=ie;i++)); do
-#         local STEPNAME=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .stepName' | jq -r)
-#         local NAME=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .name' | jq -r)
-#         local TYPE=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .type' | jq -r)
-#         echo - $STEPNAME
-        
-#         if checkName $NAME; then
-#             local ONPROCESS=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.onProcess' | jq -r)
-#             getSubFlow $ONPROCESS
-#             local ONEXCEPTION=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.onException' | jq -r)
-#             getSubFlow $ONEXCEPTION
-#         fi
-
-#         if checkType $TYPE; then
-#                 echo "  - é subtype"
-#         fi
-        
-#         if checkParallel $NAME; then           
-#                 local LENG=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.parallelExecutions' | jq -r | jq '. | length' )
-#                 local EXECUTIONS=$(cat $FLOWSPEC | jq --argjson idx $i '.start[$idx] | .params.parallelExecutions' | jq -r)
-#                 echo "  - é subtypeparallel $LEN"
-#                 processParallel $LENG $EXECUTIONS
-#         fi    
-#     done
-# }
 
 getFlow()
 {   
@@ -114,11 +14,14 @@ getFlow()
     local i
     local n
     for ((i=is;i<=ie;i++)); do
+        if [[ $i -gt 9 ]]; then mi=9; else mi=$i; fi
         n=$i$2
+        mni=$mi$2
+        local ID=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .id' | jq -r)
         local STEPNAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .stepName' | jq -r)
         local NAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .name' | jq -r)
         local TYPE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .type' | jq -r)
-        local l=${#n}
+        local l=${#mni}
         #echo $n $STEPNAME
         local COMPLEMENT
         [[ $NAME == null ]] && COMPLEMENT=$TYPE || COMPLEMENT=$NAME
@@ -135,10 +38,7 @@ getFlow()
                 ;;
         esac
 
-        #[[ -z $LEVEL ]] && formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l || formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+1))
-        #formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l
-
-        if checkName $NAME; then
+        if checkBlock $NAME; then
             formatInfo "onprocess" "onProcess" $l          
             local ONPROCESS=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.onProcess' | jq -r)
             getFlow $ONPROCESS $n sub
@@ -148,7 +48,6 @@ getFlow()
         fi
 
         if checkChoice $TYPE; then
-                #echo "  - é subtype"
                 local WHEN_LEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .when | length')
                 local WHEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .when' | jq -c)
                 local OTHERWISE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .otherwise' | jq -r) 
@@ -160,10 +59,9 @@ getFlow()
         if checkParallel $NAME; then           
                 local PARA_LEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.parallelExecutions' | jq -r | jq '. | length' )
                 local EXECS=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.parallelExecutions' | jq -r)
-                #echo $EXECS
-                #echo "  - é subtypeparallel $LEN"
-                #formatInfo "execution" "parallel" $l
-                processParallel $PARA_LEN $EXECS $n
+                echo "$EXECS" > $DGB_GS_CACHE/$ID-EXECUTIONS.json
+                processParallel $PARA_LEN $ID $n
+                rm $DGB_GS_CACHE/$ID-EXECUTIONS.json
         fi    
     done
 
@@ -237,9 +135,9 @@ formatInfo()
     esac
 }
 
-checkName()
+checkBlock()
 {
-    if [[ " ${subTreeNames[*]} " =~ " ${1} " ]]; then
+    if [[ " ${subTreeBlock[*]} " =~ " ${1} " ]] || echo "$1" | grep -qw "stream"; then
         true
     else
         false
@@ -266,21 +164,45 @@ checkParallel()
 
 processParallel()
 {
+    #echo "$@"
     local LEN=$1
-    local PEXECUTIONS=$2
+    local ID=$2
+    local PEXECUTIONS=$DGB_GS_CACHE/$ID-EXECUTIONS.json
     local n=$3
     local i
     for ((i=0;i<=LEN;i++)); do
+      #echo "*** $PEXECUTIONS" 
       if [ $i != $LEN ]; then
-        local DESCRIPTION=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .description' | jq -r)
-        local EXECUTIONID=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .executionId' | jq -r)
-        local TARGET=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .target' | jq -r)
+        local DESCRIPTION=$(jq -r --argjson idx $i '.[$idx] | .description' $PEXECUTIONS)
+        #local DESCRIPTION=$(jq -r --argjson idx $i '.[$idx] | .description' $PEXECUTIONS)
+        local EXECUTIONID=$(jq -r --argjson idx $i '.[$idx] | .executionId' $PEXECUTIONS)
+        #local EXECUTIONID=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .executionId' | jq -r)
+        local TARGET=$(jq -r --argjson idx $i '.[$idx] | .target' $PEXECUTIONS)
+        #local TARGET=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .target' | jq -r)
         #NAME=$(cat $FLOWSPEC | jq --arg sf "$SUBFLOW" --argjson idx $i '.[$sf][$idx] | .name' | jq -r)
         formatInfo "execution" "$EXECUTIONID" $l
         getFlow $TARGET $n sub
-      fi 
+      fi
     done
 }
+
+# processParallel()
+# {
+#     local LEN=$1
+#     local PEXECUTIONS=$2
+#     local n=$3
+#     local i
+#     for ((i=0;i<=LEN;i++)); do
+#       if [ $i != $LEN ]; then
+#         local DESCRIPTION=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .description' | jq -r)
+#         local EXECUTIONID=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .executionId' | jq -r)
+#         local TARGET=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .target' | jq -r)
+#         #NAME=$(cat $FLOWSPEC | jq --arg sf "$SUBFLOW" --argjson idx $i '.[$sf][$idx] | .name' | jq -r)
+#         formatInfo "execution" "$EXECUTIONID" $l
+#         getFlow $TARGET $n sub
+#       fi 
+#     done
+# }
 
 processChoice()
 {
@@ -296,10 +218,3 @@ processChoice()
       fi 
     done
 }
-
-#getStartFlow
-#getFlow "start"
-
-#for r in (${KUST[@]}); do
-#    echo "*" $r
-#done
