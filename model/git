@@ -123,6 +123,22 @@ CreateReadme()
   CreatePipelineTree $PIPELINE $MAJ_VERSION $FLOWSPEC >> $PIPE_REPO_README
 }
 
+CreateDocumentationFolder()
+{
+  local PIPELINE=$1
+  local MAJ_VERSION=$2
+  FLOWSPEC=$3
+  rm -rf $documentationPath
+  mkdir -p $documentationPath
+  touch $documentationPath/.start
+  processFlow "start"
+  echo '```' >> $documentationPath/README.md
+  tree -t -d $documentationPath | awk 'NR>2 {print last} {last=$0}' >> $documentationPath/README.md
+  echo '```' >> $documentationPath/README.md
+
+  #tree -t -d $documentationPath | awk 'NR>2 {print last} {last=$0}'
+}
+
 CreateCommitMessage()
 {
   local FLOWSPEC=$1
@@ -144,7 +160,8 @@ CreatePipelineTree()
   printf "## This is the pipeline components tree:\n"
   printf "\`\`\`bash\n"
   #cat $DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION/flowspec.json | jq '.start[] | (.stepName)' | jq -r 
-  getFlow "start"
+  #getFlow "start"
+  tree -t -d $documentationPath | awk 'NR>2 {print last} {last=$0}'
   printf "\`\`\`\n"
 }
 

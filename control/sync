@@ -14,7 +14,8 @@ PIPE_NAME=$PIPELINE
 PIPE_PATH="$DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION"
 PIPE_JSON="$PIPE_PATH/flowspec.json"
 PIPE_LINE="$(getModelPipelineIDandVersion $PIPELINE $MAJ_VERSION)"
-
+documentationPath="$PIPE_PATH/docs"
+tempPath="$DGB_GS_CACHE/"
 
 PIPE_ID=$(echo $PIPE_LINE | awk '{print $1}')
 PIPE_VERSION="$(echo $PIPE_LINE | awk '{print $2}')"
@@ -60,7 +61,13 @@ cat <<EOT > $PIPE_PATH/version.json
 }
 EOT
 
+Info "Creating the Documentation Folder"
+Info "Documentation Path: $documentationPath"
+CreateDocumentationFolder $PIPELINE $MAJ_VERSION $PIPE_JSON
 CreateReadme $PIPELINE $MAJ_VERSION $PIPE_JSON
+
+
+
 
 cd $PIPE_PATH
 

@@ -1,0 +1,302 @@
+#!/bin/bash
+
+#PIPE_NAME="simple-viacep-weather-integration"
+# PIPE_NAME=$1
+# REPOFOLDER=$HOME/.dgb-gs/realms/demo/pipelines/$PIPE_NAME-v1
+# FLOWSPEC=~/.dgb-gs/realms/demo/pipelines/$PIPE_NAME-v1/flowspec.json
+# LIST=$(jq -r '.start[] | .stepName' $FLOWSPEC)
+# KUST+=($(jq -r 'keys_unsorted[]' $FLOWSPEC))
+# CLIST=($LIST)
+# RLIST=($KUST)
+
+#subTreeBlock=("block-execution-connector" "for-each-connector" "stream" "stream-db-connector-v3" "stream-excel-connector" "stream-file-reader-connector")
+# subTreeBlock=("block-execution-connector" "for-each-connector" "retry-connector" "do-while-connector")
+# subTreeChoice=("choice")
+# subTreeParallel=("parallel-execution-connector")
+
+# # Absolute path to this script, e.g. /home/user/bin/foo.sh
+# SCRIPT=$(readlink -f "$0")
+# # Absolute path this script is in, thus /home/user/bin
+# SCRIPTPATH=$(dirname "$SCRIPT")
+# #echo $SCRIPTPATH
+
+
+# #myConfig="$HOME/.dipctl/config.json"
+
+# interpreterPath="$SCRIPTPATH/interpreters"
+# templatesPath="$SCRIPTPATH/templates"
+# documentationPath="$SCRIPTPATH/docs"
+# #documentationPath="$REPOFOLDER/documentation"
+# tempPath="/tmp"
+
+
+
+# #tipos de conectores que tem sub navigation
+# #Number of Root Objects
+# NTO=$(cat $FLOWSPEC | jq '. | length')
+
+# #Number of Start[] Objects
+# NSO=$(cat $FLOWSPEC | jq '.start | length')
+# l=0
+
+processFlow()
+{   
+    #Info "Inicializando processamento do FLow em $FLOWSPEC"
+    local ROOT="$1"
+    local LEVEL=$3
+    local INSIDE="$4"
+    local is=0
+    local NSO=$(cat $FLOWSPEC | jq --arg root "$ROOT" '.[$root] | length')
+    local ie=$((NSO-1))
+    local mi     
+    local i
+    local n
+    for ((i=is;i<=ie;i++)); do
+        if [[ $i -gt 9 ]]; then mi=9; else mi=$i; fi
+        n=$i$2
+        mni=$mi$2
+        local ID=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .id' | jq -r)
+        local STEPNAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .stepName' | jq -r)
+        local NAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .name' | jq -r)
+        local TYPE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .type' | jq -r)
+        local l=${#n}
+        
+        local COMPLEMENT
+        [[ $NAME == null ]] && COMPLEMENT=$TYPE || COMPLEMENT=$NAME
+        #echo $LEVEL
+        # case $LEVEL in
+        #     choice)
+        #         formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+2))
+        #         ;;
+        #     sub)
+        #         formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+1))
+        #         ;;
+        #     *)
+        #         formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l
+                
+        #         ;;
+        # esac
+
+        if checkName $NAME; then
+
+            createPipeFileStructure "$ROOT" $i "$STEPNAME ($COMPLEMENT)" $ID "block"
+            formatInfo "onprocess" "onProcess" $l          
+            local ONPROCESS=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.onProcess' | jq -r)
+            if [[ ! -z $ONPROCESS ]]
+            then
+                createPipeFileStructure "$ROOT" $i "$STEPNAME ($COMPLEMENT)" "$ONPROCESS" "onprocess"
+                processFlow "$ONPROCESS" $l onprocess $ID
+                formatInfo "onexception" "onException" $l
+            fi
+
+            local ONEXCEPTION=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.onException' | jq -r)
+            if [[ $ONEXCEPTION != "null" ]]
+            then
+                createPipeFileStructure "$ROOT" $i "$STEPNAME ($COMPLEMENT)" "$ONEXCEPTION" "onexception"
+                processFlow "$ONEXCEPTION" $l onexception $ID
+            fi           
+        
+        elif checkChoice $TYPE; then
+                createPipeFileStructure $ROOT $i "$STEPNAME ($COMPLEMENT)" $ID "choice"
+                local WHEN_LEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .when | length')
+                local WHEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .when' | jq -c)
+                processChoices $WHEN_LEN "$WHEN" $i $l "$ROOT" "$STEPNAME ($COMPLEMENT)"
+
+                local OTHERWISE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .otherwise' | jq -r)
+                if [[ $OTHERWISE != "null" ]]
+                then
+                    formatInfo "otherwise" "$OTHERWISE" $l                   
+                    createPipeFileStructure "$ROOT" $i "$STEPNAME ($COMPLEMENT)" "$OTHERWISE" "otherwise"
+                    processFlow "$OTHERWISE" $l choice 
+                fi
+        elif checkParallel $NAME; then
+                createPipeFileStructure $ROOT $i "$STEPNAME ($COMPLEMENT)" $ID "parallel" 
+                local PARA_LEN=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.parallelExecutions' | jq -r | jq '. | length' )
+                local EXECS=$(jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .params.parallelExecutions' $FLOWSPEC | jq -r)
+
+                if [[ $EXECS != "null" ]]
+                then
+                    echo "$EXECS" > $tempPath/$ID-EXECUTIONS.json
+                    processParallels $PARA_LEN $ID $i $l "$ROOT" "$STEPNAME ($COMPLEMENT)"
+                fi
+        
+        else
+            createPipeFileStructure "$ROOT" $i "$STEPNAME ($COMPLEMENT)" $ID "normal"
+        fi           
+    done
+}
+
+createPipeFileStructure()
+{
+    local INSIDE="$1"
+    local POSITION=$2
+    local NAME="$3"
+    local ID="$4"
+    local TYPE="$5"
+    local TYPENAME="$6"
+
+    FIVEID=$(echo ${ID:0:6})
+    if [[ $POSITION -lt 10 ]]; then POSITION="0"$POSITION; fi
+
+    # if block, create a directory with subdirectories /block/onprocess/xxxxx
+
+    case $TYPE in
+        normal)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/."$ID"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        block)
+            #INSIDEID=$(echo $ID | sed "s/-onProcessTrack//")
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/."$ID"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        onprocess)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/onProcess
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/onProcess/.$ID
+            fi
+            ;;
+        onexception)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/onException
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/onException/.$ID
+            fi
+            ;;
+        choice)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"           
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/.$ID
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        when)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/when-"$ID"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/when-"$ID"/."$ID"
+            fi
+            ;;
+        otherwise)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/otherwise-"$ID"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/otherwise-"$ID"/."$ID"
+            fi
+            ;;
+        parallel)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"           
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/.$ID
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        execution)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/execution-"$TYPENAME"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/execution-"$TYPENAME"/."$ID"
+            fi
+            ;;
+        *)
+            # mkdir -p $documentationPath/$POSITION-"$NAME"-$FIVEID
+            # touch $documentationPath/$POSITION-"$NAME"-$FIVEID/.$ID
+            # touch $documentationPath/$POSITION-"$NAME"-$FIVEID/README.md
+            ;;
+    esac
+}
+
+processParallels()
+{
+    #echo "$@"
+    local LEN=$1
+    local ID=$2
+    local PEXECUTIONS=$tempPath/$ID-EXECUTIONS.json
+    local n=$3
+    local l=$4
+    local ROOT=$5
+    local STEPNAME=$6
+    local i
+    for ((i=0;i<=LEN;i++)); do
+      #echo "*** $PEXECUTIONS" 
+      if [ $i != $LEN ]; then
+        local DESCRIPTION=$(jq -r --argjson idx $i '.[$idx] | .description' $PEXECUTIONS)
+        #local DESCRIPTION=$(jq -r --argjson idx $i '.[$idx] | .description' $PEXECUTIONS)
+        local EXECUTIONID=$(jq -r --argjson idx $i '.[$idx] | .executionId' $PEXECUTIONS)
+        #local EXECUTIONID=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .executionId' | jq -r)
+        local TARGET=$(jq -r --argjson idx $i '.[$idx] | .target' $PEXECUTIONS)
+        #local TARGET=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .target' | jq -r)
+        #NAME=$(cat $FLOWSPEC | jq --arg sf "$SUBFLOW" --argjson idx $i '.[$sf][$idx] | .name' | jq -r)
+        createPipeFileStructure "$ROOT" $n "$STEPNAME" "$TARGET" "execution" "$EXECUTIONID"
+        formatInfo "execution" "$EXECUTIONID" $l
+        processFlow "$TARGET" $l sub
+      fi
+      #echo "***" 
+    done
+}
+
+processChoices()
+{
+    local WHEN_LEN=$1
+    local WHEN=$2
+    local n=$3
+    local l=$4
+    local ROOT=$5
+    local STEPNAME=$6
+    local i
+    for ((i=0;i<=WHEN_LEN;i++)); do
+      if [ $i != $WHEN_LEN ]; then
+        local TARGET=$(echo $WHEN | jq --argjson idx $i '.[$idx] | .target' | jq -r)
+        createPipeFileStructure "$ROOT" $n "$STEPNAME" "$TARGET" "when"
+        #formatInfo "when" "$TARGET" $l
+        processFlow "$TARGET" $l choice
+      fi 
+    done
+}
+
+checkName()
+{
+    if [[ " ${subTreeBlock[*]} " =~ " ${1} " ]] || echo "$1" | grep -qw "stream"; then
+        true
+    else
+        false
+    fi
+}
+
+# checkChoice()
+# {
+#     if [[ " ${subTreeChoice[*]} " =~ " ${1} " ]]; then
+#         true
+#     else
+#         false
+#     fi
+# }
+
+# checkParallel()
+# {
+#     if [[ " ${subTreeParallel[*]} " =~ " ${1} " ]]; then
+#         true
+#     else
+#         false
+#     fi
+# }
