@@ -1,6 +1,6 @@
 # dgb-gitsync v0.2
 
-# What's New on this version
+## What's New on this version
 
 * The new script code structure is more modular and now allows it to be expanded easily
 * Now the script supports the configuration of pipelines based on their major version
