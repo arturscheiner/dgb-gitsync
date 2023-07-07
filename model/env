@@ -11,8 +11,10 @@ SetEnvironmentData()
     DGB_GS_DIR="$HOME/.$ME"
     DGB_GS_CACHE=$DGB_GS_DIR/cache
     #REALM="$(cat $DIGIBEECTL_CFG | grep "realm" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
-    REALM=$(getModelRealm)
-    ACCOUNT=$(getModelAccount)
+    if [[ "$1" != "-i"]]; then
+        REALM=$(getModelRealm)
+        ACCOUNT=$(getModelAccount)
+    fi
     DGB_GS_PIPES=$DGB_GS_DIR/realms/$REALM/pipelines
     USER_PATHS=$(echo ${PATH//:/ })
 }
