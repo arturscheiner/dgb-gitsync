@@ -5,10 +5,8 @@ showViewHeader(){
 }
 
 showViewRealmAccount(){
-    if [[ "$1" != "-i" ]]; then
-        printf "realm: $REALM\n"
-        printf "account: $ACCOUNT\n\n"
-    fi
+    printf "realm: $REALM\n"
+    printf "account: $ACCOUNT\n\n"
 }
 
 initViewError(){

@@ -1,7 +1,9 @@
 #!/bin/bash
 
 initViewMain(){
-    showViewRealmAccount
+    if [[ "$1" != "-i" ]]; then
+        showViewRealmAccount
+    fi
     ############################################################
     # Process the input options.                               #
     ############################################################
