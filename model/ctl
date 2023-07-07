@@ -36,16 +36,18 @@ getModelPipelineIDandVersion()
 
 getModelRealm()
 {
-    local REALM="$(cat $DIGIBEECTL_CFG | grep "realm" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
-
-    echo $REALM
+    if [[ "$1" != "-i" ]]; then
+        local REALM="$(cat $DIGIBEECTL_CFG | grep "realm" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
+        echo $REALM
+    fi
 }
 
 getModelAccount()
-{
-    local ACCOUNT="$(cat $DIGIBEECTL_CFG | grep "email" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
-
-    echo $ACCOUNT
+{   
+    if [[ "$1" != "-i" ]]; then
+        local ACCOUNT="$(cat $DIGIBEECTL_CFG | grep "email" | awk -F: '{print $2}' | sed 's/\"//g;s/,//g;s/ //g')"
+        echo $ACCOUNT
+    fi
 }
 
 getDigibeeCtl(){
