@@ -2,6 +2,6 @@
 
 initControlMain()
 {
-    initEnvVariables
+    initEnvVariables $1
     initFileSystem
 }

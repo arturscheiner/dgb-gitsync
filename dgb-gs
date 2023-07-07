@@ -40,7 +40,7 @@ showViewHeader
 #SetEnvironmentData
 
 if CheckRequirements $1; then
-    initControlMain
+    initControlMain $1
     initViewMain "$@"
 else
     initViewError
