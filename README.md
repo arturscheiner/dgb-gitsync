@@ -6,11 +6,12 @@
 * Now the script supports the configuration of pipelines based on their major version
 * Ability to bind a pipeline configuration with a git repo, using the -b option
 * The option -l now lists the configured pipelines with their respective bind status
-* Corrected a bug where the removal of a pipeline wasn't workig on the previous version
+* Corrected a bug where the removal of a pipeline wasn't working on the previous version
 * The sync (-s) and watch (-w) uses the same internal mechanics
 * When a pipeline is synched with its repository, it creates a git branch in the repo for each minor version
 * Support for git commit messages and description integrated with a Digibee pipeline capsule
 * Support for git merge according the configuration of a Digibee pipeline capsule
+* Support for git tags according the configuration of a Digibee pipeline capsule
 * When synching a pipeline the README.md is automatically created with a full pipeline tree inside of it  
 * When synching a pipeline a docs folder is automatically created with the full pipeline structure
 * The main interface now indicates the realm and account that is currently configured on digibeectl
@@ -20,6 +21,10 @@
 * The option to deploy (-d) the script on the system was changed to install (-i)
 * The help was updated to support the new options
 * The -c now checks for other dependencies like jq and tree in addition to git and digibeectl  
+
+## Sample Pipeline Repository
+
+* [dgb-hello-world-v1][(https://github.com/arturscheiner/dgb-hello-world-v1)]
 
 # Disclaimer
 
