@@ -86,10 +86,14 @@ checkControlPipeline()
 
 CheckRequirements()
 {
-  if $(getDigibeeCtl) && $(getDigibeeCtlConfig); then
+  if [[ "$1" != "-i" ]]; then
+    if $(getDigibeeCtl) && $(getDigibeeCtlConfig); then
+      true
+    else 
+      false
+    fi
+  else
     true
-  else 
-    false
   fi
 }
 

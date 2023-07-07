@@ -38,7 +38,8 @@ for c in $(ls $controllerPath); do [ ! -d $controllerPath/$c ] && . $controllerP
 ############################################################
 showViewHeader
 #SetEnvironmentData
-if CheckRequirements; then
+
+if CheckRequirements $1; then
     initControlMain
     initViewMain "$@"
 else
