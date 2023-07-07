@@ -24,7 +24,9 @@
 
 ## Sample Pipeline Repository
 
-* [dgb-hello-world-v1][(https://github.com/arturscheiner/dgb-hello-world-v1)]
+The repository listed bellow is a sample of a pipeline that was synched by dgb-gitsync v0.2
+
+* [dgb-hello-world-v1](https://github.com/arturscheiner/dgb-hello-world-v1)
 
 # Disclaimer
 
