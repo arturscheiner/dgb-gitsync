@@ -99,23 +99,23 @@ Check()
     Title "about dependencies" white
     CheckDigibeeCtl
     CheckGit
+    CheckTree
+    CheckJq
     printf "\n"
-    Title "about this script" white
-    CheckThisScript
-    printf "\n"
+    # Title "about this script" white
+    # CheckThisScript
+    # printf "\n"
 }
 
 CheckThisScript()
 {
-  TRY_FIND=$(which $THIS)
-
+  TRY_FIND=$(which $ME)
+  echo $TRY_FIND
     if [ -z $TRY_FIND ]
     then
         printf "$(TT red; TT bold)\xE2\x9C\x97$(TT white; TT normal) This script is not deployed on a PATH.\n" 
         printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) These are the available PATHS configured for this profile:\n"
-        
-
-        
+           
         for p in $(echo $USER_PATHS); 
         do
             [ $p = "/usr/local/bin" ] && printf "  $(TT blue; TT bold)$p$(TT white; TT normal)\n" || printf "  $p\n"
@@ -125,19 +125,16 @@ CheckThisScript()
         printf "$(TT blue; TT bold)\xE2\x87\xB2$(TT white; TT normal) Deploy it using the recommended command from the current directory:\n\n"
         printf "  $(TT green; TT bold)sudo $0 -i /usr/local/bin$(TT white; TT normal)\n"
     else
-        # printf "Seems that this script is already deployed on this system!\n"
-        # printf "Check it out where it is deployed:\n\n"
-        # printf "  $(TT blue; TT bold)$TRY_FIND$(TT white; TT normal)\n\n"
         CheckThisScriptVersion
     fi 
 }
 
 CheckThisScriptVersion()
 {
-  TRY_FIND=$(which $THIS)
+  TRY_FIND=$(which $ME)
   REPO_PATH="https://github.com/arturscheiner/dgb-gitsync.git"
   ONLINE_PATH="https://raw.githubusercontent.com/arturscheiner/dgb-gitsync/main/dgb-gs"
-  DEPLOYED=$(shasum $(which $THIS) | awk '{print $1}')
+  DEPLOYED=$(shasum $(which $ME) | awk '{print $1}')
   ACTUAL=$(shasum $(echo $0) | awk '{print $1}')
   ONLINE=$(shasum <(curl -s $ONLINE_PATH) | awk '{print $1}')
 
@@ -199,5 +196,29 @@ CheckGit()
     printf "$(TT yellow; TT bold)\u23f6$(TT white; TT normal) Git is not installed on your system.\n"
   else
     printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) Git is installed on your system: $(TT blue; TT bold)$TRY_GIT$(TT white; TT normal)\n"
+  fi
+}
+
+CheckTree()
+{
+  TRY_TREE=$(which tree)
+
+  if [ -z $TRY_TREE ]
+  then
+    printf "$(TT yellow; TT bold)\u23f6$(TT white; TT normal) Tree is not installed on your system.\n"
+  else
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) Tree is installed on your system: $(TT blue; TT bold)$TRY_TREE$(TT white; TT normal)\n"
+  fi
+}
+
+CheckJq()
+{
+  TRY_JQ=$(which jq)
+
+  if [ -z $TRY_JQ ]
+  then
+    printf "$(TT yellow; TT bold)\u23f6$(TT white; TT normal) Jq is not installed on your system.\n"
+  else
+    printf "$(TT green; TT bold)\xE2\x9C\x94$(TT white; TT normal) Jq is installed on your system: $(TT blue; TT bold)$TRY_JQ$(TT white; TT normal)\n"
   fi
 }

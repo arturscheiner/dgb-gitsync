@@ -1,0 +1,13 @@
+#!/bin/bash
+
+treeView()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    Title "Tree of the latest synched pipeline"
+    echo "$(TT orange)$PIPELINE-v$MAJ_VERSION$(TT normal)"
+    echo  "|"
+    treeControlPipeline $PIPELINE $MAJ_VERSION
+    echo
+}

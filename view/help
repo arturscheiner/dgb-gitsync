@@ -9,7 +9,8 @@ Help()
     printf "b\tBind a pipeline from the available list with a git repo\n\tE.g. -> $(TT green)$THIS_TYPE -b pipeline-config-name $(TT underline)git@bitbucket.org:arturscheiner/pipeline-repo-name.git$(TT normal; TT white)\n\n"
     printf "l\tList all the pipelines available and binded\n\tE.g. -> $(TT green)$THIS_TYPE -l$(TT white)\n\n"
     printf "r\tRemove a pipeline from the configured git sync list\n\tE.g. -> $(TT green)$THIS_TYPE -b pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
-    printf "s\tSync a pipeline with its git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
+    printf "s\tSync a configured pipeline with its git repo\n\tE.g. -> $(TT green)$THIS_TYPE -s pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
+    printf "t\tShow a configured and synched pipeline's tree \n\tE.g. -> $(TT green)$THIS_TYPE -t pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
     printf "w\tWatch and sync when a pipeline changes\n\tE.g. -> $(TT green)$THIS_TYPE -w pipeline-name -v pipeline-major-version$(TT normal; TT white)\n\n"
    
    printf "$(TT yellow)about this script$(TT white)\n"

@@ -62,6 +62,19 @@ optionView-s()
     fi
 }
 
+optionView-t()
+{
+    if [[ ! -z $PIPELINE ]]; then
+        if [[ ! $MAJ_VERSION =~ ^-?[1-9]$ ]]; then       
+            Error "-v option is required and should be an integer > 0"
+            callForHelp
+            exit
+        else
+            treeView $PIPELINE $MAJ_VERSION
+        fi
+    fi
+}
+
 optionView-w()
 {
     if [[ ! -z $PIPELINE ]]; then

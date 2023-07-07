@@ -1,6 +1,25 @@
-# Dgb Git Sync
+# dgb-gitsync v0.2
 
-This bash script allows you to easily sync a Digibee pipeline with a git repo.
+# What's New on this version
+
+* The new script code structure is more modular and now allows it to be expanded easily
+* Now the script supports the configuration of pipelines based on their major version
+* Ability to bind a pipeline configuration with a git repo, using the -b option
+* The option -l now lists the configured pipelines with their respective bind status
+* Corrected a bug where the removal of a pipeline wasn't workig on the previous version
+* The sync (-s) and watch (-w) uses the same internal mechanics
+* When a pipeline is synched with its repository, it creates a git branch in the repo for each minor version
+* Support for git commit messages and description integrated with a Digibee pipeline capsule
+* Support for git merge according the configuration of a Digibee pipeline capsule
+* When synching a pipeline the README.md is automatically created with a full pipeline tree inside of it  
+* When synching a pipeline a docs folder is automatically created with the full pipeline structure
+* The main interface now indicates the realm and account that is currently configured on digibeectl
+* Pipelines with the same name but with different major versions are treated differently and can be binded with its own git repo
+* Pipelines with the same name but in different realms treated according the realm that is configured on digibeectl
+* A new option -t can be used to show a full pipeline tree for an already synched pipeline
+* The option to deploy (-d) the script on the system was changed to install (-i)
+* The help was updated to support the new options
+* The -c now checks for other dependencies like jq and tree in addition to git and digibeectl  
 
 # Disclaimer
 
@@ -64,13 +83,25 @@ dgb-gs -c
 ```
 7) Add a digibee pipeline git repo to be managed by this script. PS: Before adding a pipeline repo, you must create one on your preferred git platform
 ```
-dgb-gs -a https://github.com/arturscheiner/digibee-pipeline-name.git
+dgb-gs -a digibee-pipeline-name -v pipeline-major-version
 ```
-8) Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm and must have the same name of its git repo 
+8) List the configured pipelines 
 ```
-dgb-gs -s digibee-pipeline-name
+dgb-gs -l
 ```
-9)  Get some HELP
+9) Bind a digibee configured pipeline (check the list name) with its respective repo. PS: The pipeline must exist on the realm 
+```
+dgb-gs -b pipeline-config-name git@bitbucket.org:arturscheiner/pipeline-repo-name.git
+```
+10) Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm
+```
+dgb-gs -s digibee-pipeline-name -v pipeline-major-version
+```
+11) Also, you can watch a digibee pipeline for changes to sync it whenever the "save" button is pressed on the screen
+```
+dgb-gs -w digibee-pipeline-name -v pipeline-major-version
+```
+12) Get some HELP
 ```
 dgb-gs -h
 ```
@@ -80,20 +111,26 @@ Help Information
 Syntax: dgb-gs [-a|l|r|s|c|d|h] params
 
 about pipeline stuff
-a	Add a new pipeline git repo to the git sync list
-	E.g. -> dgb-gs -a git@bitbucket.org:arturscheiner/pipeline-name.git
+a	Add a new pipeline to the available list
+	E.g. -> dgb-gs -a pipeline-name -v pipeline-major-version
 
-l	List all the pipelines configured
+b	Bind a pipeline from the available list with a git repo
+	E.g. -> dgb-gs -b pipeline-config-name git@bitbucket.org:arturscheiner/pipeline-repo-name.git
+
+l	List all the pipelines available and binded
 	E.g. -> dgb-gs -l
 
-r	Remove a pipeline from the pipeline list
-	E.g. -> dgb-gs -r pipeline-name
+r	Remove a pipeline from the configured git sync list
+	E.g. -> dgb-gs -b pipeline-name -v pipeline-major-version
 
-s	Sync a pipeline with its git repo
-	E.g. -> dgb-gs -s pipeline-name
-	
+s	Sync a configured pipeline with its git repo
+	E.g. -> dgb-gs -s pipeline-name -v pipeline-major-version
+
+t	Show a configured and synched pipeline's tree
+	E.g. -> dgb-gs -t pipeline-name -v pipeline-major-version
+
 w	Watch and sync when a pipeline changes
-	E.g. -> dgb-gs -w pipeline-name
+	E.g. -> dgb-gs -w pipeline-name -v pipeline-major-version
 
 about this script
 c	Check this script deployment
@@ -104,10 +141,10 @@ h	Show this help information
 	E.g. -> dgb-gs -h
 ```
 
-### Obs: This option just work when running ./dgb-gs inside the repo cloned folder.
+### Obs: This option just shows, when running ./dgb-gs inside the repo cloned folder.
 
 ```
 about this script
-d	Deploy this script into a directory
-	E.g. -> sudo ./dgb-gs -d /usr/local/bin
+i   Install this script into a directory
+	E.g. -> sudo ./dgb-gs -i /usr/local/bin
 ```

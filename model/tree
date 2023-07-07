@@ -38,6 +38,10 @@
 # #Number of Start[] Objects
 # NSO=$(cat $FLOWSPEC | jq '.start | length')
 # l=0
+showModelPipelineTree()
+{
+    tree -t -d $documentationPath | awk 'NR>2 {print last} {last=$0}'
+}
 
 processFlow()
 {   

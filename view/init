@@ -9,7 +9,7 @@ initViewMain(){
     OPTERR=0
     OPTION=$1
 
-    isLocal && OPTIONS="hlca:b:s:r:i:v:w:" || OPTIONS="hlca:b:s:r:v:w:"
+    isLocal && OPTIONS="hlca:b:s:r:t:i:v:w:" || OPTIONS="hlca:b:s:r:t:v:w:"
 
     while getopts $OPTIONS option; do
     case $option in
@@ -42,6 +42,10 @@ initViewMain(){
             local MAINOPT=$option
             ;;
         r) # list script
+            local PIPELINE=$OPTARG
+            local MAINOPT=$option  
+            ;;
+        t) # list script
             local PIPELINE=$OPTARG
             local MAINOPT=$option  
             ;;

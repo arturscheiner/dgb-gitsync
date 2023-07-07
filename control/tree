@@ -1,0 +1,17 @@
+#!/bin/bash
+
+treeControlPipeline()
+{
+    local PIPELINE=$1
+    local MAJ_VERSION=$2
+
+    PIPE_PATH="$DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION"
+    documentationPath="$PIPE_PATH/docs"
+
+    if [[ -f $documentationPath/.start ]]
+    then
+        showModelPipelineTree
+    else
+        Info "The tree for this pipeline is not available. Run the -s option first"
+    fi
+}

@@ -4,11 +4,6 @@
 # Written by: Artur Scheiner
 # Email: artur.scheiner@gmail.com
 
-MAIN_VERSION="v0"
-HASH_VERSION=$(shasum $(echo $0) | awk '{print substr($1,0,5)}')
-HVERSION="$MAIN_VERSION.$HASH_VERSION"
-
-
 #Global Variables
 # Absolute path to this script, e.g. /home/user/bin/foo.sh
 THIS_SCRIPT=$(readlink -f "$0")
@@ -28,6 +23,11 @@ viewPath="$SCRIPTPATH/view"
 controllerPath="$SCRIPTPATH/control"
 filtersPath="$modelPath/filters"
 tempPath="/tmp/$ME"
+
+MAJOR_VERSION="0"
+MINOR_VERSION="2"
+HASH_VERSION=$(cat $THIS_SCRIPT $modelPath/* $controllerPath/* $viewPath/* | shasum | awk '{print substr($1,0,5)}')
+HVERSION="v$MAJOR_VERSION.$MINOR_VERSION.$HASH_VERSION"
 
 for m in $(ls $modelPath); do [ ! -d $modelPath/$m ] && . $modelPath/$m; done
 for v in $(ls $viewPath); do [ ! -d $viewPath/$v ] && . $viewPath/$v; done
