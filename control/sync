@@ -75,7 +75,7 @@ if ! checkControlGitBranch $PIPELINE $PIPE_VERSION; then
   createModelBranch $PIPELINE $PIPE_VERSION
 fi
 
-git checkout v$PIPE_VERSION
+git switch v$PIPE_VERSION
 git add *
 
 if checkControlGitTagFromFlowSpec $PIPE_JSON; then
@@ -93,11 +93,13 @@ EOF
 git push --tags --set-upstream origin v$PIPE_VERSION
 
 if checkControlGitMergeFromFlowSpec $PIPE_JSON; then
-  Info "to merge" 
-  git switch $(getModelMainBranchNameFromRepo $PIPELINE $PIPE_VERSION)
+  local MAINREPO=$(getModelMainBranchNameFromRepo $PIPELINE $PIPE_VERSION)
+  Info "to merge: from $PIPE_VERSION to $MAINREPO" 
+  git switch $MAINREPO
   git merge v$PIPE_VERSION
   git add *
   git push
+  git switch v$PIPE_VERSION
 else
   Info "no merge"
 fi
