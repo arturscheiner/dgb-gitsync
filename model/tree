@@ -60,6 +60,7 @@ processFlow()
         n=$i$2
         mni=$mi$2
         local ID=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .id' | jq -r)
+        jq -c -r --arg root "$ROOT" --argjson idx $i '.[$root][$idx]' $FLOWSPEC > $tempPath/$ID.json
         local STEPNAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .stepName' | jq -r)
         local NAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .name' | jq -r)
         local TYPE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .type' | jq -r)
@@ -67,19 +68,19 @@ processFlow()
         
         local COMPLEMENT
         [[ $NAME == null ]] && COMPLEMENT=$TYPE || COMPLEMENT=$NAME
-        #echo $LEVEL
-        # case $LEVEL in
-        #     choice)
-        #         formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+2))
-        #         ;;
-        #     sub)
-        #         formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+1))
-        #         ;;
-        #     *)
-        #         formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l
+
+        case $LEVEL in
+            choice)
+                formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+2))
+                ;;
+            sub)
+                formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $((l+1))
+                ;;
+            *)
+                formatInfo "normal" "$STEPNAME ($COMPLEMENT)" $l
                 
-        #         ;;
-        # esac
+                ;;
+        esac
 
         if checkName $NAME; then
 
@@ -130,6 +131,23 @@ processFlow()
     done
 }
 
+genDoc()
+{
+    # local ROOT=$1
+    # local POSITION=$2
+    local ID=$1
+    local NAME=$(jq -r '.name' $tempPath/$ID.json)
+    local TYPE=$(jq -r '.type' $tempPath/$ID.json)
+    [[ $NAME == null ]] && local DESCRIPTOR=$TYPE || local DESCRIPTOR=$NAME
+
+    if [[ -f $interpreterPath/$DESCRIPTOR ]]; then
+        #mkdir -p $documentationPath
+        $interpreterPath/$DESCRIPTOR $POSITION $ID $templatesPath $documentationPath $tempPath
+        #echo $DESCRIPTOR $POSITION $ID $templatesPath $documentationPath $tempPath
+    fi
+    
+}
+
 createPipeFileStructure()
 {
     local INSIDE="$1"
@@ -151,7 +169,8 @@ createPipeFileStructure()
             then
                 mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"
                 touch "$INSIDEFOLDER"/$POSITION-"$NAME"/."$ID"
-                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
             fi
             ;;
         block)

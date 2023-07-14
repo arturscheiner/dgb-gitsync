@@ -19,6 +19,8 @@ isLocal()[[ $0 == ./* ]]
 isLocal && THIS_TYPE="$0" || THIS_TYPE="$ME"
 
 modelPath="$SCRIPTPATH/model"
+interpreterPath="$SCRIPTPATH/model/interpreters"
+templatesPath="$SCRIPTPATH/model/templates"
 viewPath="$SCRIPTPATH/view"
 controllerPath="$SCRIPTPATH/control"
 filtersPath="$modelPath/filters"

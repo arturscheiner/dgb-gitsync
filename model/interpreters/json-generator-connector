@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# This script name
+DENOMINATOR="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+
+POSITION=$1
+ID=$2
+templatesPath=$3
+documentationPath=$4
+tempPath=$5
+
+OBJECTSPEC=$tempPath/$ID.json
+STEPNAME=$(cat $OBJECTSPEC | jq -r '.stepName')
+FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
+FIVEID=$(echo ${ID:0:5})
+
+mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+
+sed "s/--STEPNAME--/$STEPNAME/g;\
+     s/--DENOMINATOR--/$DENOMINATOR/g;\
+     s/--JSONCODE--/$(cat $OBJECTSPEC | jq '.params | .json' | sed 's/^\"//;s/\"$//')/g;\
+     s/--FAILONERROR--/$FAILONERROR/g; \
+     /--RAWOBJECT--/r $OBJECTSPEC" \
+     $templatesPath/$DENOMINATOR.md | sed "/--RAWOBJECT--/d"
+
+# > $documentationPath/"$STEPNAME"-$FIVEID/README.md
+
+#rm $OBJECTSPEC

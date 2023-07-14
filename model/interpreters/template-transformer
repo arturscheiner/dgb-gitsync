@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# This script name
+DENOMINATOR="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+
+POSITION=$1
+ID=$2
+templatesPath=$3
+documentationPath=$4
+tempPath=$5
+
+OBJECTSPEC=$tempPath/$ID.json
+
+jq -r '. | .template' $OBJECTSPEC > $tempPath/$ID-TEMPLATE.txt
+
+STEPNAME=$(jq -r '.stepName' $OBJECTSPEC)
+MODELPATH=$(jq -r '. | .modelPath' $OBJECTSPEC)
+PRESERVEORIGINAL=$(jq -r '. | .preserveOriginal' $OBJECTSPEC)
+TEMPLATE=$tempPath/$ID-TEMPLATE.txt
+
+FIVEID=$(echo ${ID:0:5})
+
+mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+
+sed "s/--STEPNAME--/$STEPNAME/g;\
+     s/--DENOMINATOR--/$DENOMINATOR/g;\
+     s/--MODELPATH--/$MODELPATH/g; \
+     s/--PRESERVEORIGINAL--/$PRESERVEORIGINAL/g; \
+     /--TEMPLATE--/r $TEMPLATE" \
+     $templatesPath/$DENOMINATOR.md | \
+sed "/--RAWOBJECT--/r $OBJECTSPEC" | \
+sed "/--RAWOBJECT--/d;/--TEMPLATE--/d"
+
+# > $documentationPath/"$STEPNAME"-$FIVEID/README.md
+#rm $OBJECTSPEC
