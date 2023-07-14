@@ -1,6 +1,12 @@
-# dgb-gitsync v0.2
+# dgb-gitsync v0.3
 
-## What's New on this version
+## What's New on the version v0.3
+* Auto-creation of the README.md for each component of the tree
+* Ability to use ***custom templates/interpreters*** to generate the README.md for individual components
+* The components that doesn't have a specific template/interpreter uses the ***generic*** README.md builder
+* Minor adjustments on the git sync flow 
+
+## What's New on the version v0.2
 
 * The new script code structure is more modular and now allows it to be expanded easily
 * Now the script supports the configuration of pipelines based on their major version

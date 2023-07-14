@@ -10,23 +10,15 @@ documentationPath=$4
 tempPath=$5
 
 OBJECTSPEC=$tempPath/$ID.json
-#PARAMSOBJ="$(cat $OBJECTSPEC | jq -r '.params')"
-#echo "estou aqui"
-#if [[ "$PARAMSOBJ" != "null" ]]; then
-#jq -r '.params | keys[] as $k | "\($k): \(.[$k])\n"' $OBJECTSPEC | sed -e 's|\([A-Z][^A-Z]\)| \1|g' | awk '{$1=toupper(substr($1,0,1))substr($1,2)}1' > $tempPath/$ID-PARAMS.txt
-     jq -r '. | keys[] as $k | "* \($k)\n```\n\(.[$k])\n```\n"' $OBJECTSPEC > $tempPath/$ID-PARAMS.txt
-#else
-#     jq -r '.params | keys[] as $k | "* \($k)\n```\n\(.[$k])\n```\n"' $OBJECTSPEC > $tempPath/$ID-PARAMS.txt
-#fi
+
+jq -r '. | keys[] as $k | "* \($k)\n```\n\(.[$k])\n```\n"' $OBJECTSPEC > $tempPath/$ID-PARAMS.txt
+
 
 STEPNAME="$(cat $OBJECTSPEC | jq -r '.stepName')"
 FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
 FIVEID=$(echo ${ID:0:5})
 PARAMS=$tempPath/$ID-PARAMS.txt
-#OBJECTRAW=/tmp/$ID-RAW.json
-#OBJECT="$(cat $OBJECTRAW)"
-#echo $PARAMS
-#mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+
 
 sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--DENOMINATOR--/$DENOMINATOR/g;\
@@ -34,8 +26,3 @@ sed "s/--STEPNAME--/$STEPNAME/g;\
      $templatesPath/$DENOMINATOR.md | \
 sed "/--RAWOBJECT--/r $OBJECTSPEC" | \
 sed "/--RAWOBJECT--/d;/--PARAMS--/d"
-
-# > $documentationPath/"$STEPNAME"-$FIVEID/README.md
-
-
-#rm $OBJECTSPEC
