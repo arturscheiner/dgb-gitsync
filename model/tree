@@ -144,6 +144,9 @@ genDoc()
         #mkdir -p $documentationPath
         $interpreterPath/$DESCRIPTOR $POSITION $ID $templatesPath $documentationPath $tempPath
         #echo $DESCRIPTOR $POSITION $ID $templatesPath $documentationPath $tempPath
+    else
+        local DESCRIPTOR="generic"
+        $interpreterPath/$DESCRIPTOR $POSITION $ID $templatesPath $documentationPath $tempPath
     fi
     
 }
@@ -180,7 +183,8 @@ createPipeFileStructure()
             then
                 mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"
                 touch "$INSIDEFOLDER"/$POSITION-"$NAME"/."$ID"
-                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
             fi
             ;;
         onprocess)
@@ -205,7 +209,8 @@ createPipeFileStructure()
             then
                 mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"           
                 touch "$INSIDEFOLDER"/$POSITION-"$NAME"/.$ID
-                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
             fi
             ;;
         when)
@@ -230,7 +235,8 @@ createPipeFileStructure()
             then
                 mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"           
                 touch "$INSIDEFOLDER"/$POSITION-"$NAME"/.$ID
-                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
             fi
             ;;
         execution)

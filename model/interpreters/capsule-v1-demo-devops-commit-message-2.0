@@ -19,7 +19,7 @@ PARAMS=$tempPath/$ID-PARAMS.txt
 #OBJECTRAW=/tmp/$ID-RAW.json
 #OBJECT="$(cat $OBJECTRAW)"
 #echo $PARAMS
-mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+#mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
 
 sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--DENOMINATOR--/$DENOMINATOR/g;\

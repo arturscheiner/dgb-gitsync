@@ -18,7 +18,7 @@ STEPNAME=$(cat $OBJECTSPEC | jq -r '.stepName')
 FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
 FIVEID=$(echo ${ID:0:5})
 
-mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+#mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
 
 sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--DENOMINATOR--/$DENOMINATOR/g;\
