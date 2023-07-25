@@ -28,7 +28,7 @@ tempPath="/tmp/$ME"
 
 MAJOR_VERSION="0"
 MINOR_VERSION="3"
-HASH_VERSION=$(cat $THIS_SCRIPT $modelPath/* $controllerPath/* $viewPath/* | shasum | awk '{print substr($1,0,5)}')
+HASH_VERSION=$(awk '{print}' $THIS_SCRIPT $controllerPath/* $viewPath/* $interpreterPath/* $templatesPath/* $modelPath/* | shasum | awk '{print substr($1,0,5)}')
 HVERSION="v$MAJOR_VERSION.$MINOR_VERSION.$HASH_VERSION"
 
 for m in $(ls $modelPath); do [ ! -d $modelPath/$m ] && . $modelPath/$m; done
