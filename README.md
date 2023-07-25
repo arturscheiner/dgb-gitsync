@@ -102,19 +102,19 @@ dgb-gs -a digibee-pipeline-name -v pipeline-major-version
 ```
 dgb-gs -l
 ```
-9) Bind a digibee configured pipeline (check the list name) with its respective repo. PS: The pipeline must exist on the realm 
+1) Bind a digibee configured pipeline (check the list name) with its respective repo. PS: The pipeline must exist on the realm and the repository should be valid and exists on the git repo
 ```
 dgb-gs -b pipeline-config-name git@bitbucket.org:arturscheiner/pipeline-repo-name.git
 ```
-10) Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm
+1)  Sync a digibee pipeline with its respective repo. PS: The pipeline must exist on the realm
 ```
 dgb-gs -s digibee-pipeline-name -v pipeline-major-version
 ```
-11) Also, you can watch a digibee pipeline for changes to sync it whenever the "save" button is pressed on the screen
+1)  Also, you can watch a digibee pipeline for changes to sync it whenever the "save" button is pressed on the screen
 ```
 dgb-gs -w digibee-pipeline-name -v pipeline-major-version
 ```
-12) Get some HELP
+1)  Get some HELP
 ```
 dgb-gs -h
 ```
