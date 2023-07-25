@@ -57,7 +57,10 @@ cat <<EOT > $PIPE_PATH/version.json
   "version" : "$PIPE_VERSION",
   "checksum" : "$PIPE_CHECKSUM",
   "summary" : "$SUMMARY",
-  "description" : "$DESCRIPTION"
+  "description" : "$DESCRIPTION",
+  "size": "SMALL",
+  "replicas": "1",
+  "consumers": "10"
 }
 EOT
 
