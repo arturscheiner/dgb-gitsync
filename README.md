@@ -88,7 +88,7 @@ cd ./dgb-gitsync
 ```
 5) From inside the cloned directory, deploy this script in your $PATH. On this step the script will copy itself to the directory specified as a parameter. The directory must be a $PATH directory, otherwise you will not be able to run the command anywhere in your workstation, without the "./" in front of it.
 ```
-sudo ./dgb-gs -d /usr/local/bin
+sudo ./dgb-gs -i /usr/local/bin
 ```
 6) Check if your system complies with all dependencies need for this script to run without errors
 ```
