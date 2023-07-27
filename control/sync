@@ -19,7 +19,12 @@ tempPath="$DGB_GS_CACHE/"
 
 PIPE_ID=$(echo $PIPE_LINE | awk '{print $1}')
 PIPE_VERSION="$(echo $PIPE_LINE | awk '{print $2}')"
-PIPE_CHECKSUM=$(cat $PIPE_PATH/version.json | jq -r '.checksum')
+
+if [[ -f $PIPE_PATH/metadata.json ]]; then
+  PIPE_CHECKSUM=$(cat $PIPE_PATH/metadata.json | jq -r '.checksum')
+else
+  PIPE_CHECKSUM=""
+fi
 
 VERSIONS_PATH="$PIPE_PATH/versions/$PIPE_VERSION"
 DOCS_PATH="$PIPE_PATH/docs/$PIPE_VERSION"
@@ -28,6 +33,8 @@ mkdir -p $VERSIONS_PATH $DOCS_PATH
 
 digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | jq > $PIPE_JSON
 digibeectl get pipeline --pipeline-id $PIPE_ID --flowspec | jq > $PIPE_PATH/versions/$PIPE_VERSION/flowspec.json
+
+local PIPE_SHASUM="$(cat $PIPE_JSON | jq -c | shasum | awk '{print $1}')"
 
 declare -a MESSAGE="($(CreateCommitMessage $PIPE_JSON $PIPE_VERSION $PIPE_CHECKSUM))"
 
@@ -50,12 +57,13 @@ echo "Commit Description - $DESCRIPTION"
 #New Checksumm
 PIPE_CHECKSUM=$(shasum $PIPE_JSON | awk '{print $1}' | awk '{print substr($0,0,5)}')
 
-cat <<EOT > $PIPE_PATH/version.json
+cat <<EOT > $PIPE_PATH/metadata.json
 {
   "name" : "$PIPE_NAME",
   "id" : "$PIPE_ID",
   "version" : "$PIPE_VERSION",
   "checksum" : "$PIPE_CHECKSUM",
+  "shasum" : "$PIPE_SHASUM",
   "summary" : "$SUMMARY",
   "description" : "$DESCRIPTION",
   "size": "SMALL",
@@ -68,9 +76,7 @@ Info "Creating the Documentation Folder"
 Info "Documentation Path: $documentationPath"
 CreateDocumentationFolder $PIPELINE $MAJ_VERSION $PIPE_JSON
 CreateReadme $PIPELINE $MAJ_VERSION $PIPE_JSON
-
-
-
+createModelGitIgnore $PIPELINE $MAJ_VERSION $PIPE_JSON
 
 cd $PIPE_PATH
 
@@ -79,6 +85,7 @@ if ! checkControlGitBranch $PIPELINE $PIPE_VERSION; then
 fi
 
 git switch v$PIPE_VERSION
+git pull
 git add *
 
 if checkControlGitTagFromFlowSpec $PIPE_JSON; then

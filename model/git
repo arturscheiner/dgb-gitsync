@@ -123,6 +123,16 @@ CreateReadme()
   CreatePipelineTree $PIPELINE $MAJ_VERSION $FLOWSPEC >> $PIPE_REPO_README
 }
 
+createModelGitIgnore()
+{
+  local PIPELINE=$1
+  local MAJ_VERSION=$2
+  local FLOWSPEC=$3
+
+  local PIPE_REPO_GITIGNORE=$DGB_GS_PIPES/$PIPELINE-v$MAJ_VERSION/.gitignore
+  printf ".*\n!.gitignore" > $PIPE_REPO_GITIGNORE
+}
+
 CreateDocumentationFolder()
 {
   local PIPELINE=$1
