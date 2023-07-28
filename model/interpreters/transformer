@@ -14,7 +14,7 @@ OBJECTSPEC=$tempPath/$ID.json
 jq '. | .transformSpec' $tempPath/$ID.json > $tempPath/$ID-TRANSFORMSPEC.json
 
 TRANSFORMSPEC=$tempPath/$ID-TRANSFORMSPEC.json
-STEPNAME=$(cat $OBJECTSPEC | jq -r '.stepName')
+STEPNAME=$(cat $OBJECTSPEC | jq -r '.stepName' | sed 's/\//_/g')
 FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
 FIVEID=$(echo ${ID:0:5})
 

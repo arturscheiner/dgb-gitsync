@@ -61,7 +61,7 @@ processFlow()
         mni=$mi$2
         local ID=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .id' | jq -r)
         jq -c -r --arg root "$ROOT" --argjson idx $i '.[$root][$idx]' $FLOWSPEC > $tempPath/$ID.json
-        local STEPNAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .stepName' | jq -r)
+        local STEPNAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .stepName' | jq -r | sed 's/\//_/g')
         local NAME=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .name' | jq -r)
         local TYPE=$(cat $FLOWSPEC | jq --arg root "$ROOT" --argjson idx $i '.[$root][$idx] | .type' | jq -r)
         local l=${#n}
