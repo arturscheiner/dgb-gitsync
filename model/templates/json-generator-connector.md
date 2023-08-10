@@ -1,13 +1,17 @@
 # Step Name -> --STEPNAME--
-## Connector Denominator -> --DENOMINATOR--
+## Component Denominator -> --DENOMINATOR--
 
-## Description
+## Component Description
 
 JSON Generator (Mock) creates a JSON object. This component accepts any input.
 
 Check this component official documentation: [--DENOMINATOR--](https://docs.digibee.com/documentation/components/tools/json-generator "Digibee --DENOMINATOR-- documentation")
 
 ## Component Configuration Details
+### Documentation
+
+--DOCUMENTATION--
+
 ### Parameters
 
 * JSON

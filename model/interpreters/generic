@@ -19,9 +19,15 @@ FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
 FIVEID=$(echo ${ID:0:5})
 PARAMS=$tempPath/$ID-PARAMS.txt
 
+DOCUMENTATION=$(jq -r '.__documentation__' $OBJECTSPEC)
+
+if [[ "$DOCUMENTATION" == "null" ]]; then
+     DOCUMENTATION="O parâmetro referente à documentação descritiva do componente não foi preenchido ou está indisponível para este componente." 
+fi
 
 sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--DENOMINATOR--/$DENOMINATOR/g;\
+     s/--DOCUMENTATION--/$DOCUMENTATION/g;\
      /--PARAMS--/r $PARAMS" \
      $templatesPath/$DENOMINATOR.md | \
 sed "/--RAWOBJECT--/r $OBJECTSPEC" | \

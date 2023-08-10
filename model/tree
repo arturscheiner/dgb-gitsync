@@ -1,43 +1,5 @@
 #!/bin/bash
 
-#PIPE_NAME="simple-viacep-weather-integration"
-# PIPE_NAME=$1
-# REPOFOLDER=$HOME/.dgb-gs/realms/demo/pipelines/$PIPE_NAME-v1
-# FLOWSPEC=~/.dgb-gs/realms/demo/pipelines/$PIPE_NAME-v1/flowspec.json
-# LIST=$(jq -r '.start[] | .stepName' $FLOWSPEC)
-# KUST+=($(jq -r 'keys_unsorted[]' $FLOWSPEC))
-# CLIST=($LIST)
-# RLIST=($KUST)
-
-#subTreeBlock=("block-execution-connector" "for-each-connector" "stream" "stream-db-connector-v3" "stream-excel-connector" "stream-file-reader-connector")
-# subTreeBlock=("block-execution-connector" "for-each-connector" "retry-connector" "do-while-connector")
-# subTreeChoice=("choice")
-# subTreeParallel=("parallel-execution-connector")
-
-# # Absolute path to this script, e.g. /home/user/bin/foo.sh
-# SCRIPT=$(readlink -f "$0")
-# # Absolute path this script is in, thus /home/user/bin
-# SCRIPTPATH=$(dirname "$SCRIPT")
-# #echo $SCRIPTPATH
-
-
-# #myConfig="$HOME/.dipctl/config.json"
-
-# interpreterPath="$SCRIPTPATH/interpreters"
-# templatesPath="$SCRIPTPATH/templates"
-# documentationPath="$SCRIPTPATH/docs"
-# #documentationPath="$REPOFOLDER/documentation"
-# tempPath="/tmp"
-
-
-
-# #tipos de conectores que tem sub navigation
-# #Number of Root Objects
-# NTO=$(cat $FLOWSPEC | jq '. | length')
-
-# #Number of Start[] Objects
-# NSO=$(cat $FLOWSPEC | jq '.start | length')
-# l=0
 showModelPipelineTree()
 {
     tree -t -d $documentationPath | awk 'NR>2 {print last} {last=$0}'
@@ -149,6 +111,108 @@ genDoc()
         $interpreterPath/$DESCRIPTOR $POSITION $ID $templatesPath $documentationPath $tempPath
     fi
     
+}
+
+createPipelineFlowChart()
+{
+    local INSIDE="$1"
+    local POSITION=$2
+    local NAME="$3"
+    local ID="$4"
+    local TYPE="$5"
+    local TYPENAME="$6"
+
+    FIVEID=$(echo ${ID:0:6})
+    if [[ $POSITION -lt 10 ]]; then POSITION="0"$POSITION; fi
+
+   case $TYPE in
+        normal)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/."$ID"
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        block)
+            #INSIDEID=$(echo $ID | sed "s/-onProcessTrack//")
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/."$ID"
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        onprocess)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/onProcess
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/onProcess/.$ID
+            fi
+            ;;
+        onexception)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/onException
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/onException/.$ID
+            fi
+            ;;
+        choice)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"           
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/.$ID
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        when)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/when-"$ID"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/when-"$ID"/."$ID"
+            fi
+            ;;
+        otherwise)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/otherwise-"$ID"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/otherwise-"$ID"/."$ID"
+            fi
+            ;;
+        parallel)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"           
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/.$ID
+                #touch "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+                genDoc $ID > "$INSIDEFOLDER"/$POSITION-"$NAME"/README.md
+            fi
+            ;;
+        execution)
+            INSIDEFOLDER="$(find $documentationPath -type f -name ".$INSIDE"  | sed "s/\/.$INSIDE//")"
+            if [[ ! -z $INSIDEFOLDER ]]
+            then
+                mkdir -p "$INSIDEFOLDER"/$POSITION-"$NAME"/execution-"$TYPENAME"
+                touch "$INSIDEFOLDER"/$POSITION-"$NAME"/execution-"$TYPENAME"/."$ID"
+            fi
+            ;;
+        *)
+            # mkdir -p $documentationPath/$POSITION-"$NAME"-$FIVEID
+            # touch $documentationPath/$POSITION-"$NAME"-$FIVEID/.$ID
+            # touch $documentationPath/$POSITION-"$NAME"-$FIVEID/README.md
+            ;;
+    esac        
 }
 
 createPipeFileStructure()

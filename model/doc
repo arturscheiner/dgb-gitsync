@@ -186,24 +186,6 @@ processParallel()
     done
 }
 
-# processParallel()
-# {
-#     local LEN=$1
-#     local PEXECUTIONS=$2
-#     local n=$3
-#     local i
-#     for ((i=0;i<=LEN;i++)); do
-#       if [ $i != $LEN ]; then
-#         local DESCRIPTION=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .description' | jq -r)
-#         local EXECUTIONID=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .executionId' | jq -r)
-#         local TARGET=$(echo $PEXECUTIONS | jq --argjson idx $i '.[$idx] | .target' | jq -r)
-#         #NAME=$(cat $FLOWSPEC | jq --arg sf "$SUBFLOW" --argjson idx $i '.[$sf][$idx] | .name' | jq -r)
-#         formatInfo "execution" "$EXECUTIONID" $l
-#         getFlow $TARGET $n sub
-#       fi 
-#     done
-# }
-
 processChoice()
 {
     local WHEN_LEN=$1
