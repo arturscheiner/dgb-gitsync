@@ -27,7 +27,7 @@ filtersPath="$modelPath/filters"
 tempPath="/tmp/$ME"
 
 MAJOR_VERSION="0"
-MINOR_VERSION="3"
+MINOR_VERSION="4"
 HASH_VERSION=$(awk '{print}' $THIS_SCRIPT $controllerPath/* $viewPath/* $interpreterPath/* $templatesPath/* $modelPath/* | shasum | awk '{print substr($1,0,5)}')
 HVERSION="v$MAJOR_VERSION.$MINOR_VERSION.$HASH_VERSION"
 
