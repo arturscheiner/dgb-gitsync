@@ -1,5 +1,8 @@
-# dgb-gitsync v0.3
+# dgb-gitsync v0.4
 
+## What's New on the version v0.4
+* The component docs now have a Documentation session that reflects the new "documentation" field of components 
+  
 ## What's New on the version v0.3
 * Auto-creation of the README.md for each component of the tree
 * Ability to use ***custom templates/interpreters*** to generate the README.md for individual components
