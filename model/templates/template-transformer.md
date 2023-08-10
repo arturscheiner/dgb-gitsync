@@ -1,13 +1,17 @@
 # Step Name -> --STEPNAME--
-## Connector Denominator -> --DENOMINATOR--
+## Component Denominator -> --DENOMINATOR--
 
-## Description
+## Component Description
 
 Template Transformer generates XML, HTML, text and other data from a specified template. The component can receive data to dynamically fill the template from a JSON received in its input message.
 
 Check this component official documentation: [--DENOMINATOR--](https://docs.digibee.com/documentation/components/tools/template-transformer "Digibee --DENOMINATOR-- documentation")
 
 ## Component Configuration Details
+### Documentation
+
+--DOCUMENTATION--
+
 ### Parameters
 
 * Model Path - A dotted notation representation of the fields that should be used as source model and then transformed by the template.

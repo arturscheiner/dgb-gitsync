@@ -27,7 +27,3 @@ sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--FAILONERROR--/$FAILONERROR/g; \
      /--RAWOBJECT--/r $OBJECTSPEC" \
      $templatesPath/$DENOMINATOR.md | sed "/--RAWOBJECT--/d"
-
-# > $documentationPath/"$STEPNAME"-$FIVEID/README.md
-
-#rm $OBJECTSPEC

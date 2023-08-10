@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # This script name
 DENOMINATOR="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 
@@ -9,26 +11,22 @@ tempPath=$5
 
 OBJECTSPEC=$tempPath/$ID.json
 
-#jq -r '.params | keys[] as $k | "\($k): \(.[$k])\n"' $OBJECTSPEC | sed -e 's|\([A-Z][^A-Z]\)| \1|g' | awk '{$1=toupper(substr($1,0,1))substr($1,2)}1' > $tempPath/$ID-PARAMS.txt
 jq -r '.params | keys[] as $k | "* \($k)\n```\n\(.[$k])\n```\n"' $OBJECTSPEC > $tempPath/$ID-PARAMS.txt
 
 STEPNAME="$(cat $OBJECTSPEC | jq -r '.stepName')"
 FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
 FIVEID=$(echo ${ID:0:5})
 PARAMS=$tempPath/$ID-PARAMS.txt
-#OBJECTRAW=/tmp/$ID-RAW.json
-#OBJECT="$(cat $OBJECTRAW)"
-#echo $PARAMS
-#mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+DOCUMENTATION=$(jq -r '.__documentation__' $OBJECTSPEC)
+
+if [[ "$DOCUMENTATION" == "null" ]]; then
+     DOCUMENTATION="O parâmetro referente à documentação descritiva do componente não foi preenchido ou está indisponível para este componente." 
+fi
 
 sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--DENOMINATOR--/$DENOMINATOR/g;\
+     s/--DOCUMENTATION--/$DOCUMENTATION/g;\
      /--PARAMS--/r $PARAMS" \
      $templatesPath/$DENOMINATOR.md | \
 sed "/--RAWOBJECT--/r $OBJECTSPEC" | \
 sed "/--RAWOBJECT--/d;/--PARAMS--/d"
-
-# > $documentationPath/"$STEPNAME"-$FIVEID/README.md
-
-
-#rm $OBJECTSPEC

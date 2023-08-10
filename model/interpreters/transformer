@@ -18,15 +18,16 @@ STEPNAME=$(cat $OBJECTSPEC | jq -r '.stepName' | sed 's/\//_/g')
 FAILONERROR=$(cat $OBJECTSPEC | jq '.params | .failOnError')
 FIVEID=$(echo ${ID:0:5})
 
-#mkdir -p $documentationPath/"$STEPNAME"-$FIVEID
+DOCUMENTATION=$(jq -r '.__documentation__' $OBJECTSPEC)
+
+if [[ "$DOCUMENTATION" == "null" ]]; then
+     DOCUMENTATION="O parâmetro referente à documentação descritiva do componente não foi preenchido ou está indisponível para este componente." 
+fi
 
 sed "s/--STEPNAME--/$STEPNAME/g;\
      s/--DENOMINATOR--/$DENOMINATOR/g;\
+     s/--DOCUMENTATION--/$DOCUMENTATION/g;\
      /--JOLTCODE--/r $TRANSFORMSPEC" \
      $templatesPath/$DENOMINATOR.md | \
 sed "/--RAWOBJECT--/r $OBJECTSPEC" | \
 sed "/--RAWOBJECT--/d;/--JOLTCODE--/d"
-
-# > $documentationPath/"$STEPNAME"-$FIVEID/README.md
-
-#rm $OBJECTSPEC $TRANSFORMSPEC
